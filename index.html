@@ -167,6 +167,11 @@ select.toolbtn{background:var(--panel2);border:0}
 .account-notice{font-size:12px;color:var(--gold)!important;margin-top:14px}
 .account-notice:empty{display:none}
 
+.danger{background:#b3382f;color:#fff}
+.danger:hover{background:#c8453b}
+.danger:disabled{opacity:.55;cursor:not-allowed}
+.account-card summary.danger-sum{color:#e0867f}
+
 /* ---- responsive ---- */
 @media(max-width:1000px){
  .lobby{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
@@ -311,6 +316,22 @@ select.toolbtn{background:var(--panel2);border:0}
   <div class="account-actions"><button type="button" class="greenbtn" id="connectAuth" style="margin:0">Connect account service</button></div>
   </details>
   <p class="account-notice" id="authStatus"></p>
+ </div>
+</div>
+
+<div class="account-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+ <div class="account-card">
+  <h2 id="profileTitle">Your account</h2>
+  <p id="profileInfo"></p>
+  <details>
+   <summary class="danger-sum">Close account</summary>
+   <p style="margin-top:10px">Closing your account signs you out and permanently disables sign-in. Your active online games end as a loss, and your friends, tournament entries and leaderboard profile are removed.</p>
+   <label for="closeConfirm">Type CLOSE to confirm</label>
+   <input id="closeConfirm" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="CLOSE">
+   <div class="account-actions"><button type="button" class="danger" id="closeAccountBtn">Close my account</button></div>
+   <p class="account-notice" id="closeStatus" aria-live="polite"></p>
+  </details>
+  <div class="account-actions"><button class="account-close" type="button" id="closeProfile">Done</button></div>
  </div>
 </div>
 
@@ -520,13 +541,30 @@ select.toolbtn{background:var(--panel2);border:0}
   $('onlineStatus').textContent='Search cancelled.';note('Online search cancelled.');
  };
  function openAccount(mode){setAuthMode(mode||'signup');accountUsername.value='';accountEmail.value='';accountPassword.value='';accountModal.classList.add('open');accountUsername.focus()}
- $('loginBtn').onclick=()=>{if(authUser){note('You are signed in as '+(authUser.user_metadata?.username||authUser.email)+'.');return}openAccount('login')};
+ const profileModal=$('profileModal');
+ function openProfile(){$('profileInfo').textContent='Signed in as '+(authUser.user_metadata?.username||'player')+(authUser.email?' ('+authUser.email+')':'')+'.';$('closeConfirm').value='';$('closeStatus').textContent='';profileModal.querySelector('details').open=false;profileModal.classList.add('open')}
+ $('loginBtn').onclick=()=>{if(authUser){openProfile();return}openAccount('login')};
+ $('closeProfile').onclick=()=>profileModal.classList.remove('open');
+ profileModal.addEventListener('click',e=>{if(e.target===profileModal)profileModal.classList.remove('open')});
+ $('closeAccountBtn').onclick=async()=>{
+  const st=$('closeStatus'),btn=$('closeAccountBtn');
+  if(!authClient||!authUser){st.textContent='Sign in first.';return}
+  if($('closeConfirm').value.trim()!=='CLOSE'){st.textContent='Type CLOSE in capital letters to confirm.';return}
+  btn.disabled=true;st.textContent='Closing your account…';
+  const {data,error}=await authClient.functions.invoke('maxchess-close-account',{body:{confirm:'CLOSE'}});
+  btn.disabled=false;
+  if(error||data?.error){let msg=data?.error||error?.message||'please try again';if(error?.context?.json){try{msg=(await error.context.json()).error||msg}catch(e){}}st.textContent='Could not close your account: '+msg;return}
+  if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}onlineGameId=null;onlineColor=null;onlineBusy=false;
+  try{await authClient.auth.signOut()}catch(e){}
+  authUser=null;paintProfile();loadGameChat();profileModal.classList.remove('open');
+  note(data?.emailed?'Your account was closed. A confirmation email is on its way.':'Your account was closed.');
+ };
  $('signupBtn').onclick=async()=>{if(authUser){if(authClient){const {error}=await authClient.auth.signOut();if(error){note('Could not sign out: '+error.message);return}authUser=null;paintProfile();note('Signed out of MaxChess.')}return}openAccount('signup')};
  $('connectAuth').onclick=async()=>{const ok=await connectAuth(supabaseUrl.value.trim(),supabaseKey.value.trim());if(ok)note('MaxChess account service connected.')};
  $('switchAccountMode').onclick=()=>{setAuthMode(authMode==='login'?'signup':'login');setAuthStatus(authMode==='login'?'Enter your account details below.':'Create your account below.');accountPassword.value='';accountUsername.value=''};
  $('closeAccount').onclick=()=>accountModal.classList.remove('open');
  accountModal.addEventListener('click',e=>{if(e.target===accountModal)accountModal.classList.remove('open')});
- document.addEventListener('keydown',e=>{if(e.key==='Escape')accountModal.classList.remove('open')});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){accountModal.classList.remove('open');profileModal.classList.remove('open')}});
  accountForm.onsubmit=async e=>{e.preventDefault();if(!authClient){setAuthStatus('Connect your Supabase project below before signing up or logging in.');accountPassword.value='';return}const email=accountEmail.value.trim(),password=accountPassword.value,username=accountUsername.value.trim();if(password.length<8){setAuthStatus('Use a password with at least 8 characters.');return}try{if(authMode==='login'){const {data,error}=await authClient.auth.signInWithPassword({email,password});if(error)throw error;authUser=data.user;accountModal.classList.remove('open');paintProfile();note('Welcome back to MaxChess!')}else{if(username.length<3||username.length>30){setAuthStatus('Username must be 3–30 characters.');return}const {data,error}=await authClient.auth.signUp({email,password,options:{data:{username},emailRedirectTo:'https://mbeaton36-commits.github.io/max-chess/'}});if(error)throw error;authUser=data.session?.user||null;if(data.session){accountModal.classList.remove('open');paintProfile();note('Welcome to MaxChess, '+username+'!')}else{setAuthStatus('Check your email to confirm your account, then log in.');accountPassword.value=''}}}catch(err){const msg=err.message||'Authentication failed.';if(authMode==='login'&&/invalid login credentials|invalid_credentials/i.test(msg)){setAuthStatus('That email/password did not match an existing account. If you have not signed up yet, click “New to MaxChess? Create an account” below and create it first.');}else if(authMode==='signup'&&/already registered|user already exists/i.test(msg)){setAuthStatus('An account with this email already exists. Click “Already have an account? Sign in” below.');}else{setAuthStatus(msg)}accountPassword.value=''}};
  const cfg=savedAuthConfig()||{url:'https://bvukakfhkebpsviehirr.supabase.co',key:'sb_publishable_YTyppUkZGBFHmaNOg2ZSMg_xiFJw2rG'};supabaseUrl.value=cfg.url||'';supabaseKey.value=cfg.key||'';connectAuth(cfg.url||'',cfg.key||'',true);
  paintProfile();
