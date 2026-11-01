@@ -278,7 +278,7 @@ select.toolbtn{background:var(--panel2);border:0}
     <button class="greenbtn" id="startGame">Start a new game</button><button class="widebtn" id="playComputer">Play against computer</button>
     <div class="status"><strong id="statusTitle">White to move</strong><span id="statusText" class="muted">Select a piece to see where it can move.</span></div>
     <h3 style="font-size:14px;margin:15px 0 8px">Move list</h3><div class="moves" id="moves"><span class="muted">Moves will appear here.</span></div>
-    <div class="selectrow"><label for="pieceStyle">Piece style</label><select id="pieceStyle"><option value="classic">Classic symbols</option><option value="bold">Bold symbols</option><option value="emoji">Friendly style</option></select></div>
+    <div class="selectrow"><label for="pieceStyle">Piece style</label><select id="pieceStyle"><option value="classic">Classic symbols</option><option value="bold">Bold solid</option><option value="friendly">Friendly colors</option></select></div>
     <div class="selectrow"><label for="boardTheme">Board theme</label><select id="boardTheme"><option value="brown" selected>Brown</option><option value="green">Green</option><option value="blue">Blue</option><option value="mono">Black & white</option></select></div>
     <div class="selectrow"><label for="fxMode">Fun effects</label><select id="fxMode"><option value="boom">Explosions</option><option value="boomsound">Explosions + sound</option><option value="off">Off</option></select></div>
     <div class="toast" id="toast" role="status"></div>
@@ -350,7 +350,7 @@ select.toolbtn{background:var(--panel2);border:0}
 <script>
 (()=> {
  const $=id=>document.getElementById(id), boardEl=$('board'), toast=$('toast'), toastbar=$('toastbar');
- const glyph={wp:'♙',wn:'♘',wb:'♗',wr:'♖',wq:'♕',wk:'♔',bp:'♟',bn:'♞',bb:'♝',br:'♜',bq:'♛',bk:'♚'};
+ const glyph={wp:'♙',wn:'♘',wb:'♗',wr:'♖',wq:'♕',wk:'♔',bp:'♟\uFE0E',bn:'♞',bb:'♝',br:'♜',bq:'♛',bk:'♚'};
  const emoji={wp:'♙',wn:'♘',wb:'♗',wr:'♖',wq:'♕',wk:'♔',bp:'♟',bn:'♞',bb:'♗',br:'♜',bq:'♛',bk:'♚'};
  const game=window.Chess?new Chess():null;let selected=null,legal=[],flipped=false,lastMove=null,style='classic',computerMode=false,thinking=false,puzzleMode=false,clockInitial=600,whiteSeconds=600,blackSeconds=600,clockStarted=false,clockPaused=false,flaggedSide=null,ratingFinalized=false;
  const ratingKey='maxchess_rating_v1';let ratingData=(()=>{try{return JSON.parse(localStorage.getItem(ratingKey))||{rating:1200,wins:0,losses:0,draws:0}}catch(e){return {rating:1200,wins:0,losses:0,draws:0}}})();
@@ -369,7 +369,7 @@ select.toolbtn{background:var(--panel2);border:0}
   if(!game)return;boardEl.innerHTML='';let rows=[0,1,2,3,4,5,6,7],cols=[0,1,2,3,4,5,6,7];if(flipped){rows.reverse();cols.reverse()}
   rows.forEach((r,ri)=>cols.forEach((c,ci)=>{let sq=sqname(r,c),p=game.get(sq),b=document.createElement('button');b.className='sq '+((r+c)%2===0?'light':'dark');b.setAttribute('role','gridcell');b.setAttribute('aria-label',sq+(p?', '+(p.color==='w'?'white ':'black ')+p.type:' empty'));if(selected===sq)b.classList.add('selected');if(legal.some(m=>m.to===sq)){b.classList.add('legal');if(p)b.classList.add('capture')}if(lastMove&&(lastMove.from===sq||lastMove.to===sq))b.classList.add('last');
    if(ci===0){let co=document.createElement('span');co.className='coord';co.textContent=sq[1];b.appendChild(co)}if(ri===7){let co=document.createElement('span');co.className='coord';co.style.left='auto';co.style.right='3px';co.style.top='auto';co.style.bottom='1px';co.textContent=sq[0];b.appendChild(co)}
-   if(p){let sp=document.createElement('span');sp.className='piece';sp.textContent=glyph[p.color+p.type];sp.style.color=p.color==='w'?'#fffef4':'#22231e';sp.style.textShadow=p.color==='w'?'0 1px 2px #222,1px 0 #222,-1px 0 #222,0 -1px #222':'0 1px 1px #ffffff77';if(style==='bold')sp.style.fontWeight='900';b.appendChild(sp)}b.addEventListener('click',()=>tap(sq));boardEl.appendChild(b)
+   if(p){let sp=document.createElement('span');sp.className='piece';const solid=style==='bold'||style==='friendly';sp.textContent=glyph[(solid?'b':p.color)+p.type];sp.style.color=style==='friendly'?(p.color==='w'?'#ffd23f':'#2ec4b6'):(p.color==='w'?'#fffef4':'#22231e');sp.style.textShadow=(p.color==='w'||style==='friendly')?'0 1px 2px #222,1px 0 #222,-1px 0 #222,0 -1px #222':'0 1px 1px #ffffff77';if(style==='bold'){sp.style.webkitTextStroke='1.5px #161512';sp.style.fontWeight='900'}b.appendChild(sp)}b.addEventListener('click',()=>tap(sq));boardEl.appendChild(b)
   }));
   updateInfo()
  }
@@ -428,8 +428,10 @@ select.toolbtn{background:var(--panel2);border:0}
  document.querySelectorAll('[data-lesson]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-lesson]').forEach(x=>x.classList.toggle('chosen',x===b));setLesson(b.dataset.lesson,$('lessonDetail'))});
  document.querySelectorAll('[data-learnpage]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-learnpage]').forEach(x=>x.classList.toggle('chosen',x===b));setLesson(b.dataset.learnpage,$('fullLesson'))});
  const themes={green:['#eeeed2','#769656'],blue:['#dee3e6','#6a8caf'],brown:['#f0d9b5','#b58863'],mono:['#eeeeee','#777777']};
- $('boardTheme').onchange=()=>{let t=themes[$('boardTheme').value];document.documentElement.style.setProperty('--boardlight',t[0]);document.documentElement.style.setProperty('--boarddark',t[1]);note('Board theme updated.')};
- $('pieceStyle').onchange=()=>{style=$('pieceStyle').value;render();note('Piece style updated.')};
+ function applyTheme(k){const t=themes[k]||themes.brown;document.documentElement.style.setProperty('--boardlight',t[0]);document.documentElement.style.setProperty('--boarddark',t[1])}
+ $('boardTheme').onchange=()=>{applyTheme($('boardTheme').value);try{localStorage.setItem('maxchess_theme',$('boardTheme').value)}catch(e){}note('Board theme: '+$('boardTheme').selectedOptions[0].text+'.')};
+ $('pieceStyle').onchange=()=>{style=$('pieceStyle').value;try{localStorage.setItem('maxchess_pieces',style)}catch(e){}render();note('Piece style: '+$('pieceStyle').selectedOptions[0].text+'.')};
+ try{const st=localStorage.getItem('maxchess_theme'),sp=localStorage.getItem('maxchess_pieces');if(st&&themes[st]){$('boardTheme').value=st;applyTheme(st)}if(sp&&['classic','bold','friendly'].includes(sp)){$('pieceStyle').value=sp;style=sp}}catch(e){}
  $('themeQuick').onclick=$('rightTheme').onclick=()=>{navigate('play');$('boardTheme').focus();note('Choose a board theme in the Game panel.')};
  
  const accountModal=$('accountModal'),accountForm=$('accountForm'),accountUsername=$('accountUsername'),accountPassword=$('accountPassword'),accountEmail=$('accountEmail');
@@ -592,7 +594,7 @@ select.toolbtn{background:var(--panel2);border:0}
  document.querySelectorAll('[data-learnpage]').forEach(()=>{});
  $('brandHome').onclick=()=>navigate('home');$('brandHome').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigate('home')}};
  document.querySelectorAll('.tc-btn').forEach(b=>b.onclick=()=>{$('timeControl').value=b.dataset.tc;reset(false);navigate('play')});
- (function(){const el=document.querySelector('.home-board-art');if(!el)return;const fen='rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R',g={P:'♙',N:'♘',B:'♗',R:'♖',Q:'♕',K:'♔',p:'♟',n:'♞',b:'♝',r:'♜',q:'♛',k:'♚'};
+ (function(){const el=document.querySelector('.home-board-art');if(!el)return;const fen='rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R',g={P:'♙',N:'♘',B:'♗',R:'♖',Q:'♕',K:'♔',p:'♟\uFE0E',n:'♞',b:'♝',r:'♜',q:'♛',k:'♚'};
   function cell(r,c,ch){const d=document.createElement('div');d.className='hb '+((r+c)%2===0?'light':'dark');if(ch){const sp=document.createElement('span'),w=ch===ch.toUpperCase();sp.textContent=g[ch];sp.style.color=w?'#fffef4':'#22231e';sp.style.textShadow=w?'0 1px 2px #222,1px 0 #222,-1px 0 #222,0 -1px #222':'0 1px 1px #ffffff77';d.appendChild(sp)}el.appendChild(d)}
   fen.split('/').forEach((row,r)=>{let c=0;for(const ch of row){if(/\d/.test(ch)){for(let i=0;i<Number(ch);i++)cell(r,c++,'')}else cell(r,c++,ch)}})})();
 
