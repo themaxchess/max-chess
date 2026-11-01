@@ -5,62 +5,246 @@
 <title>MaxChess — Free Online Chess</title>
 <meta name="description" content="Play chess, solve puzzles, and learn chess for free on MaxChess.">
 <style>
-:root{--bg:#171815;--side:#20221e;--panel:#262923;--panel2:#30342c;--line:#3c4037;--text:#eceee7;--muted:#a4aa9b;--green:#83b64b;--green2:#a2d15f;--boardlight:#eeeed2;--boarddark:#769656;--gold:#e8c765}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,select{font:inherit}button{cursor:pointer;border:0}button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.app{min-height:100vh;display:grid;grid-template-columns:220px minmax(500px,1fr) 300px;grid-template-rows:58px 1fr;max-width:1600px;margin:auto}.topbar{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:0 18px;background:#20221e;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}.brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:21px;letter-spacing:-.7px;min-width:190px}.brandmark{display:grid;place-items:center;background:var(--green);color:#17210e;width:35px;height:35px;border-radius:7px;font-size:25px}.brand span em{font-style:normal;color:var(--green2)}.topsearch{flex:1;max-width:440px;background:#151713;border:1px solid #363a32;border-radius:7px;padding:8px 12px;color:var(--muted)}.topright{margin-left:auto;display:flex;align-items:center;gap:9px}.toplink{background:transparent;color:#d5dacd;padding:9px;border-radius:6px}.toplink:hover{background:var(--panel2)}.login{border:1px solid #53594b;background:transparent;color:white;border-radius:6px;padding:8px 13px}.signup{background:var(--green);color:#17200f;border-radius:6px;padding:9px 14px;font-weight:800}.sidebar{grid-row:2;background:var(--side);border-right:1px solid #30332c;padding:15px 10px;min-height:calc(100vh - 58px)}.side-label{font-size:10px;color:#8e9585;letter-spacing:1.5px;font-weight:800;padding:14px 12px 6px}.navitem{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:6px;background:transparent;color:#d0d5c9;text-align:left;font-weight:600;margin:2px 0}.navitem .icon{width:23px;text-align:center;font-size:19px;color:#aeb6a2}.navitem:hover{background:#2b2e27}.navitem.active{background:#353d2d;color:#b8e58a}.navitem.active .icon{color:var(--green2)}.side-note{margin:23px 7px 0;padding:13px;background:#292d24;border:1px solid #3b4432;border-radius:7px;color:#b6bcae;font-size:12px}.side-note b{display:block;color:#edf2e7;font-size:14px;margin-bottom:5px}.main{padding:22px clamp(12px,2.2vw,30px) 40px;min-width:0}.welcome{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:20px}.welcome h1{font-size:26px;letter-spacing:-.7px;margin:0 0 4px}.welcome p{color:var(--muted);margin:0}.badge{font-size:12px;color:var(--green2);border:1px solid #475a39;border-radius:99px;padding:5px 10px;white-space:nowrap}.playgrid{display:grid;grid-template-columns:minmax(280px,1fr) minmax(200px,255px);gap:18px;align-items:start}.boardcol{min-width:0}.playerbar{display:flex;align-items:center;gap:9px;background:#23251f;padding:9px 11px;border-radius:6px 6px 0 0}.avatar{width:30px;height:30px;border-radius:5px;background:#3b4035;display:grid;place-items:center;font-size:20px}.playername{font-weight:750}.playersub{font-size:11px;color:var(--muted)}.clock{margin-left:auto;background:#131510;border:1px solid #3a3e34;border-radius:4px;padding:4px 9px;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}.board{width:100%;aspect-ratio:1;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));box-shadow:0 5px 22px #0005;touch-action:manipulation;user-select:none}.sq{aspect-ratio:1;position:relative;display:grid;place-items:center;padding:0;border-radius:0;font-size:clamp(24px,4.3vw,55px);line-height:1;color:#171915}.sq.light{background:var(--boardlight)}.sq.dark{background:var(--boarddark)}.sq.selected{background:#f6f669!important}.sq.last{background:#cdd26c}.sq .piece{z-index:1;position:relative;filter:drop-shadow(0 2px 1px #0005)}.sq.legal:after{content:"";position:absolute;width:25%;height:25%;border-radius:50%;background:#15180f55}.sq.legal.capture:after{width:86%;height:86%;border:5px solid #15180f66;background:transparent}.coord{position:absolute;font-size:10px;font-weight:800;left:3px;top:1px;color:#1e241a99;line-height:1}.boardtools{display:flex;gap:7px;padding:10px;background:#22241e;flex-wrap:wrap}.toolbtn{background:#34382f;color:#e5e9df;border-radius:5px;padding:8px 10px;font-size:13px}.toolbtn:hover{background:#444a3b}.boardfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 2px;color:var(--muted);font-size:12px}.sidegame{background:var(--panel);border:1px solid #383c33;border-radius:7px;overflow:hidden}.tabrow{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}.tab{padding:12px 5px;background:#20221e;color:var(--muted);font-weight:750}.tab.active{background:var(--panel);color:#e9f3df;border-bottom:2px solid var(--green)}.tabcontent{padding:15px}.sidegame h2{font-size:18px;margin:0 0 6px}.muted{color:var(--muted)}.desc{font-size:12px;color:var(--muted)}.greenbtn{display:block;width:100%;padding:12px;background:var(--green);color:#17210e;border-radius:5px;font-weight:850;font-size:15px;margin-top:13px}.greenbtn:hover{background:var(--green2)}.widebtn{display:block;width:100%;padding:10px;background:#3b4035;color:#edf0e7;border-radius:5px;font-weight:700;margin-top:8px}.widebtn:hover{background:#484f40}.status{background:#20221d;border-radius:5px;padding:11px;margin:13px 0;font-size:13px}.status strong{display:block;margin-bottom:3px}.moves{min-height:65px;max-height:165px;overflow:auto;font-size:13px;color:#d2d8c9;font-variant-numeric:tabular-nums}.moves ol{margin:0;padding-left:24px;columns:2}.moves li{padding:2px 0}.promo{padding:12px;background:#20221d;border-radius:5px;margin-top:14px;font-size:12px;color:var(--muted)}.promo b{display:block;color:#eaf1e3;font-size:14px;margin-bottom:3px}.extras{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}.feature{background:#22241f;border:1px solid #353930;border-radius:7px;padding:14px;text-align:left;color:var(--text)}.feature:hover{border-color:#6a8f48;background:#292e24}.feature .ficon{font-size:24px}.feature b{display:block;margin:7px 0 3px}.feature span{font-size:12px;color:var(--muted)}.rightbar{grid-row:2;border-left:1px solid #30332c;background:#1d1f1b;padding:22px 15px}.rightbar h2{font-size:16px;margin:0 0 12px}.rating-number{font-size:30px;font-weight:900;letter-spacing:-1px;color:var(--green2);margin-top:6px}.rating-note{font-size:11px;color:var(--muted);margin-top:3px}.mini-card{background:#262923;border:1px solid #373b32;border-radius:7px;padding:14px;margin-bottom:13px}.mini-card p{margin:4px 0 0;font-size:12px;color:var(--muted)}.mini-link{width:100%;background:transparent;color:#c9e5b1;text-align:left;padding:10px 0 0;font-weight:700}.right-stat{display:flex;justify-content:space-between;gap:10px;margin-top:10px;font-size:12px;color:var(--muted)}.right-stat b{color:#e4e9dc}.lesson-list{display:grid;gap:8px;margin-top:12px}.lesson{background:#20221d;border:1px solid #3c4136;border-radius:5px;padding:11px;text-align:left;color:var(--text)}.lesson:hover,.lesson.chosen{border-color:var(--green)}.lesson small{display:block;color:var(--muted);margin-top:3px}.lesson-detail{background:#20221d;padding:12px;border-radius:5px;margin-top:10px;font-size:13px}.lesson-detail h3{margin:0 0 5px}.lesson-detail p{margin:0;color:#c1c8b8}.hidden{display:none!important}.toast{font-size:12px;color:var(--green2);min-height:17px;margin-top:6px}.selectrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}select{background:#20221d;border:1px solid #42483a;border-radius:4px;color:#e9eee2;padding:6px;max-width:135px}.pageview{display:none}.pageview.active{display:block}.simplepage{max-width:760px;margin:20px auto}.simplepage h2{font-size:25px}.puzzlebox{background:#242720;border:1px solid #3b4035;padding:20px;border-radius:8px}.footer{text-align:center;color:#72786c;font-size:11px;padding:20px}.toastbar{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:#e9f1df;color:#20271a;padding:10px 16px;border-radius:6px;font-weight:700;box-shadow:0 5px 20px #0005;z-index:10;display:none}
-.home-layout{max-width:980px;margin:0 auto}.home-hero{display:grid;grid-template-columns:minmax(220px,1fr) minmax(230px,.85fr);gap:25px;align-items:center;background:#20231d;border:1px solid #394032;border-radius:10px;padding:24px;margin-bottom:18px}.home-board-art{aspect-ratio:1;max-width:330px;width:100%;margin:auto;display:flex;flex-direction:column;justify-content:space-around;text-align:center;padding:12px;background:repeating-conic-gradient(#769656 0% 25%,#eeeed2 0% 50%) 50%/25% 25%;color:#20231d;font-size:clamp(18px,3vw,30px);text-shadow:0 1px 1px #fff8;box-shadow:0 8px 25px #0006}.home-board-art span{white-space:pre;letter-spacing:2px}.home-hero-copy h2{font-size:30px;margin:0 0 8px}.home-hero-copy p,.home-panel p{color:var(--muted)}.home-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.home-action{display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;padding:17px;background:#252820;color:var(--text);border:1px solid #3a4033;border-radius:8px}.home-action:hover,.home-row:hover{background:#30372a;border-color:var(--green)}.home-action>span{font-size:25px}.home-action small{color:var(--muted)}.home-lower{display:grid;grid-template-columns:1fr 1fr;gap:14px}.home-panel{padding:17px;background:#22251f;border:1px solid #383d33;border-radius:8px}.home-panel h3{margin:0 0 5px}.home-row{width:100%;display:flex;justify-content:space-between;text-align:left;padding:12px;margin-top:6px;background:#30342c;color:var(--text);border-radius:5px}.home-rating{display:flex;align-items:baseline;gap:12px;margin:12px 0}.home-rating strong{font-size:38px;color:var(--green2)}.home-rating span{color:var(--muted);font-size:13px}@media(max-width:700px){.home-hero{grid-template-columns:1fr;padding:14px;gap:12px}.home-board-art{max-width:250px}.home-hero-copy h2{font-size:24px}.home-actions{grid-template-columns:repeat(2,1fr);gap:7px}.home-action{padding:12px}.home-lower{grid-template-columns:1fr}}
-@media(max-width:1200px){.app{grid-template-columns:190px minmax(460px,1fr)}.rightbar{display:none}.brand{min-width:160px}.playgrid{grid-template-columns:minmax(280px,1fr) minmax(190px,230px)}}
-@media(max-width:850px){.app{grid-template-columns:62px minmax(0,1fr)}.sidebar{padding:12px 6px}.side-label,.navtext,.side-note{display:none}.navitem{justify-content:center;padding:12px 0}.navitem .icon{font-size:21px}.brand{min-width:auto}.brandname{display:none}.topsearch{max-width:220px}.playgrid{grid-template-columns:1fr}.sidegame{max-width:none}.extras{grid-template-columns:repeat(3,1fr)}.main{padding:16px 12px}.welcome h1{font-size:22px}}
-@media(max-width:540px){.app{grid-template-columns:48px minmax(0,1fr);grid-template-rows:52px 1fr}.topbar{gap:9px;padding:0 8px}.brandmark{width:31px;height:31px}.topsearch{display:none}.topright{gap:3px}.toplink{font-size:12px;padding:7px}.login{display:none}.signup{padding:7px 9px;font-size:12px}.sidebar{grid-row:2}.main{padding:13px 8px}.welcome{align-items:start}.welcome h1{font-size:20px}.welcome p{font-size:12px}.badge{font-size:10px;padding:4px 7px}.playgrid{gap:10px}.sq{font-size:clamp(25px,9vw,43px)}.boardtools{gap:5px;padding:7px}.toolbtn{font-size:11px;padding:8px 7px}.extras{gap:5px;margin-top:14px}.feature{padding:8px}.feature .ficon{font-size:20px}.feature b{font-size:12px}.feature span{font-size:10px}.playerbar{padding:7px}.clock{font-size:15px}.brand{font-size:17px}}
-.boardtools select.toolbtn{max-width:150px}.clock.active-clock{background:#dce8c8;color:#1a2114;border-color:#dce8c8}.clock.flagged{background:#7b2f2f;color:#fff}.toolbtn:disabled{opacity:.45;cursor:not-allowed}
+:root{--bg:#161512;--panel:#262421;--panel2:#302e2c;--panel3:#1f1e1c;--line:#3c3a37;--text:#bababa;--strong:#e8e8e8;--muted:#8d8b88;--green:#629924;--green2:#85b23d;--blue:#3692e7;--boardlight:#f0d9b5;--boarddark:#b58863;--gold:#e8c765}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,select,input,textarea{font:inherit}
+button{cursor:pointer;border:0}
+a{color:var(--blue)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.desc{font-size:12px;color:var(--muted)}
 
-.account-modal{position:fixed;inset:0;z-index:30;background:#080a07cc;display:none;align-items:center;justify-content:center;padding:18px}.account-modal.open{display:flex}.account-card{width:min(420px,100%);background:#242720;border:1px solid #444a3b;border-radius:12px;padding:24px;box-shadow:0 20px 80px #0009}.account-card h2{margin:0 0 5px;font-size:23px}.account-card p{color:var(--muted);font-size:13px}.account-card label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}.account-card input{width:100%;padding:11px 12px;border-radius:6px;border:1px solid #4a5041;background:#171914;color:var(--text);font:inherit}.account-actions{display:flex;gap:8px;margin-top:16px}.account-actions button{flex:1;padding:11px;border-radius:6px;font-weight:800}.account-close{background:#383d32;color:var(--text)}.account-notice{font-size:12px;color:#e8c765!important;margin-top:14px}.profile-pill{background:#343b2b;color:#d4f0b9;border:1px solid #526844;border-radius:6px;padding:8px 12px;font-weight:800}
+/* ---- header / top navigation ---- */
+.app{min-height:calc(100vh - 64px);display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:6px;height:56px;padding:0 clamp(12px,3vw,40px);background:var(--panel);border-bottom:1px solid #000;box-shadow:0 2px 8px #0006;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:22px;color:var(--strong);cursor:pointer;margin-right:14px;letter-spacing:-.3px;user-select:none}
+.brandmark{font-size:30px;line-height:1;color:var(--strong)}
+.topnav{display:flex;align-items:stretch;height:100%}
+.navgroup{position:relative;display:flex;align-items:stretch}
+.navtop{background:transparent;color:var(--text);padding:0 14px;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+.navtop:hover,.navgroup:hover>.navtop,.navgroup:focus-within>.navtop{background:var(--panel2);color:#fff}
+.navtop.active{color:#fff;box-shadow:inset 0 -3px 0 var(--green)}
+.dropdown{display:none;position:absolute;top:100%;left:0;min-width:210px;background:var(--panel);border:1px solid #000;box-shadow:0 8px 20px #000a;padding:4px 0;z-index:30}
+.navgroup:hover .dropdown,.navgroup:focus-within .dropdown{display:block}
+.dropdown .navitem{display:block;width:100%;text-align:left;background:transparent;color:var(--text);padding:10px 16px;font-weight:500}
+.dropdown .navitem:hover{background:var(--panel2);color:#fff}
+.dropdown .navitem.active{color:var(--green2)}
+.topsearch{flex:0 1 220px;margin-left:auto;background:var(--bg);border:1px solid var(--line);border-radius:3px;padding:6px 10px;color:var(--text)}
+.topsearch::placeholder{color:var(--muted)}
+.topright{display:flex;align-items:center;gap:6px;margin-left:8px}
+.toplink{background:transparent;color:var(--text);padding:8px 10px;border-radius:3px}
+.toplink:hover{background:var(--panel2);color:#fff}
+.login{background:transparent;color:var(--text);padding:8px 12px;border-radius:3px;font-weight:600}
+.login:hover{background:var(--panel2);color:#fff}
+.signup{background:var(--green);color:#fff;border-radius:3px;padding:8px 14px;font-weight:700}
+.signup:hover{background:#6fae29}
+.profile-pill{background:var(--panel2);color:var(--strong);border:1px solid var(--line)}
+.profile-pill:hover{background:var(--line)}
+
+/* ---- page frame ---- */
+.main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:22px 16px 40px;min-width:0}
+.welcome,.rightbar,.badge{display:none}
+.pageview{display:none}
+.pageview.active{display:block}
+.simplepage{max-width:760px;margin:10px auto}
+.simplepage h2{font-size:26px;font-weight:400;color:var(--strong);margin:0 0 6px}
+.puzzlebox{background:var(--panel);padding:18px 20px;border-radius:3px}
+.puzzlebox h3{margin:0 0 6px;color:var(--strong);font-weight:500}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
+.toastbar{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#e8e8e8;color:#161512;padding:10px 16px;border-radius:3px;font-weight:600;box-shadow:0 5px 20px #0008;z-index:60;display:none}
+
+/* ---- buttons ---- */
+.greenbtn{display:block;width:100%;padding:12px;background:var(--green);color:#fff;border-radius:3px;font-weight:700;font-size:15px;margin-top:12px}
+.greenbtn:hover{background:#6fae29}
+.widebtn{display:block;width:100%;padding:11px;background:var(--panel2);color:var(--text);border-radius:3px;font-weight:600;margin-top:8px}
+.widebtn:hover{background:var(--line);color:#fff}
+.toolbtn{background:var(--panel2);color:var(--text);border-radius:3px;padding:8px 12px;font-size:13px;font-weight:600}
+.toolbtn:hover{background:var(--line);color:#fff}
+.toolbtn:disabled{opacity:.45;cursor:not-allowed}
+.mini-link{background:transparent;color:var(--blue);padding:4px 0;font-weight:600;text-align:left}
+.mini-link:hover{text-decoration:underline}
+select{background:var(--panel3);border:1px solid var(--line);border-radius:3px;color:var(--text);padding:6px;max-width:140px}
+select.toolbtn{background:var(--panel2);border:0}
+
+/* ---- play page ---- */
+.playgrid{display:grid;grid-template-columns:minmax(300px,640px) minmax(260px,330px);gap:20px;justify-content:center;align-items:start}
+.boardcol{min-width:0}
+.playerbar{display:flex;align-items:center;gap:10px;background:var(--panel);padding:8px 12px;border-radius:3px 3px 0 0}
+.board+.playerbar{border-radius:0 0 3px 3px}
+.avatar{width:28px;height:28px;border-radius:3px;background:var(--panel2);display:grid;place-items:center;font-size:19px;color:var(--strong)}
+.playername{font-weight:600;color:var(--strong)}
+.playersub{font-size:12px;color:var(--muted)}
+.clock{margin-left:auto;background:var(--panel3);border-radius:3px;padding:3px 10px;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text)}
+.clock.active-clock{background:var(--green);color:#fff}
+.clock.flagged{background:#a33;color:#fff}
+.board{width:100%;aspect-ratio:1;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));box-shadow:0 5px 22px #0007;touch-action:manipulation;user-select:none}
+.sq{aspect-ratio:1;position:relative;display:grid;place-items:center;padding:0;border-radius:0;font-size:clamp(24px,4.6vw,56px);line-height:1;color:#161512}
+.sq.light{background:var(--boardlight)}
+.sq.dark{background:var(--boarddark)}
+.sq.last{box-shadow:inset 0 0 0 100px rgba(155,199,0,.41)}
+.sq.selected{box-shadow:inset 0 0 0 100px rgba(20,85,30,.5)}
+.sq .piece{z-index:1;position:relative;filter:drop-shadow(0 2px 1px #0005)}
+.sq.legal:after{content:"";position:absolute;width:26%;height:26%;border-radius:50%;background:rgba(20,85,30,.5)}
+.sq.legal.capture:after{width:88%;height:88%;border:5px solid rgba(20,85,30,.5);background:transparent}
+.coord{position:absolute;font-size:10px;font-weight:700;left:3px;top:1px;color:#1e1a1699;line-height:1}
+.boardtools{display:flex;gap:6px;padding:10px 0;flex-wrap:wrap}
+.boardtools select.toolbtn{max-width:150px}
+.boardfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:2px;color:var(--muted);font-size:12px}
+.sidegame{background:var(--panel);border-radius:3px;overflow:hidden}
+.tabrow{display:grid;grid-template-columns:1fr 1fr;background:var(--panel3)}
+.tab{padding:11px 6px;background:transparent;color:var(--muted);font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.5px}
+.tab.active{background:var(--panel);color:var(--strong);box-shadow:inset 0 -2px 0 var(--green)}
+.tabcontent{padding:16px}
+.sidegame h2{font-size:18px;margin:0 0 6px;color:var(--strong);font-weight:500}
+.status{background:var(--panel3);border-radius:3px;padding:11px;margin:12px 0;font-size:13px}
+.status strong{display:block;margin-bottom:2px;color:var(--strong)}
+.moves{min-height:65px;max-height:200px;overflow:auto;font-size:13px;color:var(--text);font-variant-numeric:tabular-nums}
+.moves ol{margin:0;padding-left:24px;columns:2}
+.moves li{padding:2px 0}
+.selectrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}
+.toast{font-size:12px;color:var(--green2);min-height:17px;margin-top:6px}
+.extras{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px auto 0;max-width:1000px}
+.feature{background:var(--panel);border-radius:3px;padding:14px;text-align:left;color:var(--text)}
+.feature:hover{background:var(--panel2)}
+.feature .ficon{font-size:24px;color:var(--strong)}
+.feature b{display:block;margin:6px 0 2px;color:var(--strong)}
+.feature span{font-size:12px;color:var(--muted)}
+
+/* ---- lessons ---- */
+.lesson-list{display:grid;gap:6px;margin-top:12px}
+.lesson{background:var(--panel3);border-radius:3px;padding:10px 12px;text-align:left;color:var(--text);border-left:3px solid transparent}
+.lesson:hover,.lesson.chosen{background:var(--panel2);border-left-color:var(--green)}
+.lesson b{color:var(--strong)}
+.lesson small{display:block;color:var(--muted);margin-top:2px}
+.lesson-detail{background:var(--panel3);padding:12px;border-radius:3px;margin-top:10px;font-size:13px}
+.lesson-detail h3{margin:0 0 5px;color:var(--strong);font-weight:500}
+.lesson-detail p{margin:0}
+
+/* ---- home / lobby ---- */
+.lobby{display:grid;grid-template-columns:minmax(240px,300px) minmax(280px,520px) minmax(220px,300px);gap:20px;justify-content:center;align-items:start}
+.lobby-col{display:flex;flex-direction:column;gap:12px}
+.lobby-center{min-width:0}
+.lobby-cta{margin-top:6px}
+.home-panel{background:var(--panel);border-radius:3px;padding:16px}
+.home-panel h3{margin:0 0 4px;font-weight:500;color:var(--strong)}
+.home-panel p{color:var(--muted);margin:4px 0 10px;font-size:13px}
+.tc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.tc-btn{background:var(--panel2);color:var(--text);border-radius:3px;padding:14px 6px;text-align:center;line-height:1.25}
+.tc-btn b{display:block;font-size:20px;font-weight:500;color:var(--strong)}
+.tc-btn small{color:var(--muted);font-size:12px}
+.tc-btn:hover{background:var(--line)}
+.home-row{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;padding:11px 12px;margin-top:6px;background:var(--panel2);color:var(--text);border-radius:3px}
+.home-row:hover{background:var(--line);color:#fff}
+.home-row b{color:var(--strong)}
+.home-row small{color:var(--muted)}
+.home-board-art{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;width:100%;box-shadow:0 8px 25px #0008}
+.hb{display:grid;place-items:center;aspect-ratio:1;font-size:clamp(20px,4.4vw,48px);line-height:1;color:#161512}
+.hb.light{background:var(--boardlight)}
+.hb.dark{background:var(--boarddark)}
+.home-rating{display:flex;align-items:baseline;gap:10px;margin:8px 0}
+.home-rating strong{font-size:34px;font-weight:500;color:var(--strong)}
+.home-rating span{color:var(--muted);font-size:13px}
+
+/* ---- sign in / register ---- */
+.account-modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.72);display:none;align-items:flex-start;justify-content:center;padding:64px 16px;overflow:auto}
+.account-modal.open{display:flex}
+.account-card{width:min(380px,100%);background:var(--panel);border-radius:3px;padding:26px 28px;box-shadow:0 10px 40px #000a}
+.account-card h2{margin:0 0 4px;font-size:28px;font-weight:400;color:var(--strong)}
+.account-card p{color:var(--muted);font-size:13px;margin:0 0 4px}
+.account-card a{color:var(--blue)}
+.account-card label{display:block;font-size:13px;font-weight:600;margin:16px 0 6px;color:var(--text)}
+.account-card input{width:100%;padding:10px 12px;border-radius:3px;border:1px solid var(--line);background:var(--panel3);color:var(--strong)}
+.account-card input:focus{border-color:var(--blue);outline:none}
+.account-card details{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+.account-card summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.account-actions{display:flex;gap:8px;margin-top:16px}
+.account-actions button{flex:1;padding:11px;border-radius:3px;font-weight:700}
+#accountForm .account-actions{flex-direction:column;gap:6px;margin-top:20px}
+.account-close{background:transparent;color:var(--muted);font-weight:600}
+.account-close:hover{color:#fff}
+.account-notice{font-size:12px;color:var(--gold)!important;margin-top:14px}
+.account-notice:empty{display:none}
+
+/* ---- responsive ---- */
+@media(max-width:1000px){
+ .lobby{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .lobby-center{order:-1;grid-column:1/-1;max-width:520px;margin:0 auto;width:100%}
+ .topsearch{display:none}
+ .topright{margin-left:auto}
+}
+@media(max-width:760px){
+ .topbar{flex-wrap:wrap;height:auto;padding:8px 12px;row-gap:4px}
+ .topnav{order:3;width:100%;height:auto;flex-wrap:wrap}
+ .navtop{padding:9px 10px}
+ .playgrid{grid-template-columns:1fr}
+ .lobby{grid-template-columns:1fr}
+ .extras{grid-template-columns:1fr}
+ .sq{font-size:clamp(24px,9vw,52px)}
+ .main{padding:14px 8px 30px}
+ .login,.signup{padding:7px 10px;font-size:13px}
+}
 </style>
 </head>
 <body>
 <div class="app">
 <header class="topbar">
- <div class="brand"><div class="brandmark">♞</div><span class="brandname">MaxChess</span></div>
- <input class="topsearch" aria-label="Search" placeholder="⌕  Find a player, game, or lesson">
- <div class="topright"><button class="toplink" id="themeQuick">◐ Theme</button><button class="login" id="loginBtn">Log in</button><button class="signup" id="signupBtn">Sign up</button></div>
+ <div class="brand" id="brandHome" role="link" tabindex="0" aria-label="MaxChess home"><div class="brandmark">♞</div><span class="brandname">MaxChess</span></div>
+ <nav class="topnav" aria-label="Main">
+  <div class="navgroup"><button type="button" class="navtop">Play</button><div class="dropdown">
+   <button class="navitem active" data-page="home">Home</button>
+   <button class="navitem" data-page="play">Play chess</button>
+   <button class="navitem" data-page="computer">Play computer</button>
+  </div></div>
+  <div class="navgroup"><button type="button" class="navtop navitem" data-page="puzzles">Puzzles</button></div>
+  <div class="navgroup"><button type="button" class="navtop">Learn</button><div class="dropdown">
+   <button class="navitem" data-page="learn">Learn chess</button>
+   <button class="navitem" data-page="openings">Openings</button>
+   <button class="navitem" data-page="practice">Practice</button>
+  </div></div>
+  <div class="navgroup"><button type="button" class="navtop">Community</button><div class="dropdown">
+   <button class="navitem" data-page="community">Leaderboard &amp; games</button>
+   <button class="navitem" data-page="friends">Friends</button>
+   <button class="navitem" data-page="tournaments">Tournaments</button>
+   <button class="navitem" data-page="about">About MaxChess</button>
+  </div></div>
+  <div class="navgroup"><button type="button" class="navtop">Tools</button><div class="dropdown">
+   <button class="navitem" data-page="analysis">Analysis board</button>
+  </div></div>
+ </nav>
+ <input class="topsearch" aria-label="Search" placeholder="Find a player, game, or lesson">
+ <div class="topright"><button class="toplink" id="themeQuick">Theme</button><button class="login" id="loginBtn">Sign in</button><button class="signup" id="signupBtn">Register</button></div>
 </header>
-<aside class="sidebar">
- <div class="side-label">PLAY</div>
- <button class="navitem active" data-page="home"><span class="icon">⌂</span><span class="navtext">Home</span></button>
- <button class="navitem" data-page="play"><span class="icon">♟</span><span class="navtext">Play chess</span></button>
- <button class="navitem" data-page="puzzles"><span class="icon">♞</span><span class="navtext">Puzzles</span></button>
- <button class="navitem" data-page="computer"><span class="icon">⚙</span><span class="navtext">Play computer</span></button>
- <button class="navitem" data-page="analysis"><span class="icon">⌕</span><span class="navtext">Analysis board</span></button>
- <div class="side-label">IMPROVE</div>
- <button class="navitem" data-page="learn"><span class="icon">▤</span><span class="navtext">Learn chess</span></button>
- <button class="navitem" data-page="openings"><span class="icon">♜</span><span class="navtext">Openings</span></button>
- <button class="navitem" data-page="practice"><span class="icon">◎</span><span class="navtext">Practice</span></button>
- <div class="side-label">COMMUNITY</div>
- <button class="navitem" data-page="community"><span class="icon">🏆</span><span class="navtext">Leaderboard & games</span></button>
- <button class="navitem" data-page="friends"><span class="icon">👥</span><span class="navtext">Friends</span></button>
- <button class="navitem" data-page="tournaments"><span class="icon">🏆</span><span class="navtext">Tournaments</span></button>
- <button class="navitem" data-page="about"><span class="icon">♡</span><span class="navtext">About MaxChess</span></button>
- <div class="side-note"><b>Chess for everyone.</b>Play, learn, and improve at your own pace. No subscription needed.</div>
-</aside>
 <main class="main">
 <section class="pageview active" id="page-home">
- <div class="welcome"><div><h1>Welcome to MaxChess</h1><p>Free chess for everyone. Play, learn, and improve.</p></div><span class="badge">♞ Your chess home</span></div>
- <div class="home-layout">
-  <div class="home-hero">
-   <div class="home-board-art" aria-hidden="true"><span>♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜</span><span>♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟</span><span>　　♟　　　♟　</span><span>　　　♙　　　</span><span>　♘　　　　　</span><span>♙ ♙ ♙　♙ ♙ ♙ ♙</span><span>♖　♗ ♕ ♔ ♗ ♘ ♖</span></div>
-   <div class="home-hero-copy"><h2>Play chess online</h2><p>Challenge a friend, play the computer, or practice your next brilliant move.</p>
-    <button class="greenbtn" id="homePlay" type="button">♟ Play chess</button>
-    <button class="widebtn" id="homeComputer" type="button">Play against the computer</button>
+ <div class="lobby">
+  <div class="lobby-col">
+   <div class="home-panel"><h3>Quick pairing</h3><p>Pick a time control to start a game on this device.</p>
+    <div class="tc-grid">
+     <button type="button" class="tc-btn" data-tc="60"><b>1+0</b><small>Bullet</small></button>
+     <button type="button" class="tc-btn" data-tc="180"><b>3+0</b><small>Blitz</small></button>
+     <button type="button" class="tc-btn" data-tc="300"><b>5+0</b><small>Blitz</small></button>
+     <button type="button" class="tc-btn" data-tc="600"><b>10+0</b><small>Rapid</small></button>
+     <button type="button" class="tc-btn" data-tc="900"><b>15+0</b><small>Rapid</small></button>
+     <button type="button" class="tc-btn" data-tc="0"><b>∞</b><small>No clock</small></button>
+    </div>
+    <button class="home-row" id="homeLocal" type="button">Play with a friend on this device <span>→</span></button>
+    <button class="home-row" id="homePlayComputer" type="button">Play with the computer <span>→</span></button>
    </div>
   </div>
-  <div class="home-actions">
-   <button class="home-action" data-homegoto="puzzles"><span>♞</span><b>Puzzles</b><small>Sharpen your tactics</small></button>
-   <button class="home-action" data-homegoto="learn"><span>📘</span><b>Learn</b><small>Lessons for every level</small></button>
-   <button class="home-action" data-homegoto="analysis"><span>⌕</span><b>Analysis board</b><small>Study any position</small></button>
-   <button class="home-action" data-homegoto="openings"><span>♜</span><b>Openings</b><small>Build your opening plan</small></button>
+  <div class="lobby-center">
+   <div class="home-board-art" aria-hidden="true"></div>
+   <div class="lobby-cta"><button class="greenbtn" id="homePlay" type="button">♟ Play chess</button><button class="widebtn" id="homeComputer" type="button">Play against the computer</button></div>
   </div>
-  <div class="home-lower">
-   <div class="home-panel"><h3>♟ Start playing</h3><p>Choose your game and get to the board.</p><button class="home-row" id="homeLocal">Two players on this device <span>→</span></button><button class="home-row" id="homePlayComputer">Play the computer <span>→</span></button></div>
-   <div class="home-panel"><h3>♔ Your chess profile</h3><p>Track your progress on this device.</p><div class="home-rating"><strong id="homeRatingNumber">1200</strong><span>Starting rating</span></div><small class="muted">Your current practice rating is shown on the Play chess page.</small></div>
+  <div class="lobby-col">
+   <div class="home-panel"><h3>Your rating</h3><div class="home-rating"><strong id="homeRatingNumber">1200</strong><span>Practice rating</span></div><small class="muted">Beat the computer to move it up.</small></div>
+   <div class="home-panel"><h3>Explore</h3>
+    <button class="home-row" data-homegoto="puzzles" type="button"><span><b>Puzzles</b><br><small>Sharpen your tactics</small></span><span>→</span></button>
+    <button class="home-row" data-homegoto="learn" type="button"><span><b>Learn</b><br><small>Lessons for every level</small></span><span>→</span></button>
+    <button class="home-row" data-homegoto="analysis" type="button"><span><b>Analysis board</b><br><small>Study any position</small></span><span>→</span></button>
+    <button class="home-row" data-homegoto="openings" type="button"><span><b>Openings</b><br><small>Build your opening plan</small></span><span>→</span></button>
+   </div>
   </div>
  </div>
 </section>
@@ -73,7 +257,7 @@
    <div class="playerbar"><div class="avatar">♙</div><div><div class="playername">White pieces</div><div class="playersub">You can play both sides</div></div><div class="clock" id="whiteClock">10:00</div></div>
    <div class="boardtools"><button class="toolbtn" id="newGame">＋ New game</button><button class="toolbtn" id="undo">↶ Takeback</button><button class="toolbtn" id="flip">⇅ Flip board</button><button class="toolbtn" id="hint">✦ Hint</button><select class="toolbtn" id="timeControl" aria-label="Time control"><option value="0">No clock</option><option value="60">1 + 0 Bullet</option><option value="180">3 + 0 Blitz</option><option value="300">5 + 0 Blitz</option><option value="600" selected>10 + 0 Rapid</option><option value="900">15 + 0 Rapid</option></select><button class="toolbtn" id="exportPGN">⇩ Download PGN</button><button class="toolbtn" id="exportFEN">Copy position (FEN)</button></div>
    <div class="boardfoot"><span id="moveCount">Move 1</span><span>Tap a piece, then a square</span><span id="turnFoot">White to move</span></div>
-   <div class="home-panel" style="margin-top:14px"><h3>🌐 Play anyone online</h3><p id="onlineStatus" class="muted">Sign in, then find an opponent anywhere on MaxChess.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="greenbtn" id="findOnline" style="margin:0">Find an online game</button><button class="widebtn" id="cancelOnline" style="margin:0">Cancel search</button></div><small class="muted" style="display:block;margin-top:8px">Online games need an account. Current player ratings are provisional; automatic ranked results are not enabled yet.</small><div id="gameChatPanel" class="hidden" style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px"><b>Game chat</b><div id="gameChatMessages" style="max-height:150px;overflow:auto;margin:8px 0;font-size:12px"></div><div style="display:flex;gap:6px"><input id="gameChatInput" maxlength="500" placeholder="Message your opponent" style="min-width:0;flex:1;padding:9px;background:#171914;color:var(--text);border:1px solid #4a5041;border-radius:6px"><button class="toolbtn" id="sendGameChat">Send</button></div></div></div>
+   <div class="home-panel" style="margin-top:14px"><h3>🌐 Play anyone online</h3><p id="onlineStatus" class="muted">Sign in, then find an opponent anywhere on MaxChess.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="greenbtn" id="findOnline" style="margin:0">Find an online game</button><button class="widebtn" id="cancelOnline" style="margin:0">Cancel search</button></div><small class="muted" style="display:block;margin-top:8px">Online games need an account. Current player ratings are provisional; automatic ranked results are not enabled yet.</small><div id="gameChatPanel" class="hidden" style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px"><b>Game chat</b><div id="gameChatMessages" style="max-height:150px;overflow:auto;margin:8px 0;font-size:12px"></div><div style="display:flex;gap:6px"><input id="gameChatInput" maxlength="500" placeholder="Message your opponent" style="min-width:0;flex:1;padding:9px;background:#1f1e1c;color:var(--text);border:1px solid #3c3a37;border-radius:6px"><button class="toolbtn" id="sendGameChat">Send</button></div></div></div>
   </div>
   <aside class="sidegame">
    <div class="tabrow"><button class="tab active" data-tab="game">Game</button><button class="tab" data-tab="learn">Learn</button></div>
@@ -82,7 +266,7 @@
     <div class="status"><strong id="statusTitle">White to move</strong><span id="statusText" class="muted">Select a piece to see where it can move.</span></div>
     <h3 style="font-size:14px;margin:15px 0 8px">Move list</h3><div class="moves" id="moves"><span class="muted">Moves will appear here.</span></div>
     <div class="selectrow"><label for="pieceStyle">Piece style</label><select id="pieceStyle"><option value="classic">Classic symbols</option><option value="bold">Bold symbols</option><option value="emoji">Friendly style</option></select></div>
-    <div class="selectrow"><label for="boardTheme">Board theme</label><select id="boardTheme"><option value="green">Green</option><option value="blue">Blue</option><option value="brown">Wood</option><option value="mono">Black & white</option></select></div>
+    <div class="selectrow"><label for="boardTheme">Board theme</label><select id="boardTheme"><option value="brown" selected>Brown</option><option value="green">Green</option><option value="blue">Blue</option><option value="mono">Black & white</option></select></div>
     <div class="toast" id="toast" role="status"></div>
    </div>
    <div class="tabcontent hidden" id="learnTab"><h2>Learn as you play</h2><p class="desc">Short lessons to help you improve.</p>
@@ -95,13 +279,13 @@
 </section>
 <section class="pageview" id="page-puzzles"><div class="simplepage"><h2>♞ Daily chess puzzle</h2><p class="muted">Find the checkmate in one move. White to play.</p><div class="puzzlebox"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h3 style="margin:0">Mate in one</h3><p class="desc">Look for a move that leaves the black king with no safe square.</p></div><div style="text-align:right"><strong id="puzzleRating" style="font-size:25px;color:var(--green2)">800</strong><div class="desc">Puzzle rating</div></div></div><div id="puzzleFeedback" class="status" aria-live="polite">Find the winning move on the chessboard.</div><button class="greenbtn" id="puzzleStart">Start puzzle</button><button class="widebtn" id="puzzleReset">↻ Reset puzzle</button><button class="widebtn" id="puzzleHint">Show hint</button><button class="widebtn" id="puzzleSolution">Show solution</button></div><div class="puzzlebox" style="margin-top:12px"><h3>How puzzle training works</h3><p>Try to solve the position before asking for a hint. Your puzzle rating goes up when you solve it.</p></div></div></section>
 <section class="pageview" id="page-computer"><div class="simplepage"><h2>Play computer</h2><p class="muted">Play both colors on this device, or try the computer opponent mode. The computer mode is a simple beginner opponent in this version.</p><div class="puzzlebox"><h3>Choose your challenge</h3><button class="greenbtn" id="computerStart">Start a game</button><p class="desc">Computer play uses a basic move picker, not a grandmaster-strength engine.</p></div></div></section>
-<section class="pageview" id="page-analysis"><div class="simplepage"><h2>Analysis board</h2><p class="muted">Review games, explore opening moves, and analyze positions.</p><div class="puzzlebox"><h3>♟ Study board</h3><p>Explore variations, take back moves, and save positions to your personal study library on this device.</p><button class="greenbtn" id="analysisStart">Open study board</button><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="toolbtn" id="saveStudyPosition">＋ Save current position</button><button class="toolbtn" id="exportStudyPGN">⇩ Export study PGN</button></div><div id="studyLibrary" class="lesson-list"><p class="muted">Your saved positions will appear here.</p></div></div><div class="puzzlebox" style="margin-top:14px"><h3>♜ Stockfish analysis</h3><p>Open the current MaxChess position in Lichess analysis, where the Stockfish engine can evaluate moves and show best lines.</p><button class="greenbtn" id="stockfishAnalyze">Analyze current position</button><p class="desc">This opens the Lichess analysis board in a new tab; the engine runs there, not on MaxChess.</p></div><div class="puzzlebox" style="margin-top:14px"><h3>📂 Import a PGN game</h3><p>Paste a PGN below to load and replay a saved chess game on the MaxChess board.</p><textarea id="pgnImportText" rows="5" style="width:100%;background:#171914;color:var(--text);border:1px solid #4a5041;border-radius:6px;padding:10px;font:13px monospace" placeholder="[Event &quot;My game&quot;]&#10;1. e4 e5 2. Nf3 Nc6"></textarea><button class="greenbtn" id="importPGN">Load PGN on board</button><div class="desc" id="pgnImportStatus" aria-live="polite"></div></div><div class="puzzlebox" style="margin-top:14px"><h3>📖 Opening explorer</h3><p>Explore master-game continuations from the current board position.</p><button class="greenbtn" id="exploreOpening">Explore this position</button><div id="openingResults" class="lesson-list"><p class="muted">Load a position, then explore its opening moves.</p></div></div></div></section>
+<section class="pageview" id="page-analysis"><div class="simplepage"><h2>Analysis board</h2><p class="muted">Review games, explore opening moves, and analyze positions.</p><div class="puzzlebox"><h3>♟ Study board</h3><p>Explore variations, take back moves, and save positions to your personal study library on this device.</p><button class="greenbtn" id="analysisStart">Open study board</button><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="toolbtn" id="saveStudyPosition">＋ Save current position</button><button class="toolbtn" id="exportStudyPGN">⇩ Export study PGN</button></div><div id="studyLibrary" class="lesson-list"><p class="muted">Your saved positions will appear here.</p></div></div><div class="puzzlebox" style="margin-top:14px"><h3>♜ Stockfish analysis</h3><p>Open the current MaxChess position in Lichess analysis, where the Stockfish engine can evaluate moves and show best lines.</p><button class="greenbtn" id="stockfishAnalyze">Analyze current position</button><p class="desc">This opens the Lichess analysis board in a new tab; the engine runs there, not on MaxChess.</p></div><div class="puzzlebox" style="margin-top:14px"><h3>📂 Import a PGN game</h3><p>Paste a PGN below to load and replay a saved chess game on the MaxChess board.</p><textarea id="pgnImportText" rows="5" style="width:100%;background:#1f1e1c;color:var(--text);border:1px solid #3c3a37;border-radius:6px;padding:10px;font:13px monospace" placeholder="[Event &quot;My game&quot;]&#10;1. e4 e5 2. Nf3 Nc6"></textarea><button class="greenbtn" id="importPGN">Load PGN on board</button><div class="desc" id="pgnImportStatus" aria-live="polite"></div></div><div class="puzzlebox" style="margin-top:14px"><h3>📖 Opening explorer</h3><p>Explore master-game continuations from the current board position.</p><button class="greenbtn" id="exploreOpening">Explore this position</button><div id="openingResults" class="lesson-list"><p class="muted">Load a position, then explore its opening moves.</p></div></div></div></section>
 <section class="pageview" id="page-learn"><div class="simplepage"><h2>Learn chess</h2><p class="muted">A beginner-friendly path through the fundamentals.</p><div class="lesson-list"><button class="lesson chosen" data-learnpage="pieces">♟ The pieces<small>Know every move</small></button><button class="lesson" data-learnpage="check">⚔ Check and checkmate<small>Attack and defend</small></button><button class="lesson" data-learnpage="opening">🌱 Opening principles<small>Control the center</small></button><button class="lesson" data-learnpage="safety">🛡 Protect your pieces<small>Spot hanging pieces</small></button></div><div class="lesson-detail" id="fullLesson"><h3>The pieces</h3><p>The king moves one square. The queen moves in any straight line or diagonal. Rooks move straight, bishops move diagonally, knights jump in an L-shape, and pawns advance forward and capture diagonally.</p></div></div></section>
 <section class="pageview" id="page-openings"><div class="simplepage"><h2>Opening principles</h2><div class="puzzlebox"><p><b>1. Fight for the center.</b> Move a central pawn to claim space.</p><p><b>2. Develop your minor pieces.</b> Bring knights and bishops into the game.</p><p><b>3. Keep your king safe.</b> Castle early when it is sensible.</p><p><b>4. Don't bring your queen out too early.</b> Develop your pieces before launching an attack.</p><button class="greenbtn" id="openingStart">Try it on the board</button></div></div></section>
 <section class="pageview" id="page-practice"><div class="simplepage"><h2>Practice room</h2><p class="muted">Small habits make a stronger player.</p><div class="puzzlebox"><p>Before each move, ask yourself:</p><ol><li>Is my king safe?</li><li>Can I capture something for free?</li><li>What is my opponent threatening?</li><li>Will my piece be safe on the new square?</li></ol><button class="greenbtn" id="practiceStart">Practice on the board</button></div></div></section>
 <section class="pageview" id="page-community"><div class="simplepage"><h2>🏆 MaxChess community</h2><p class="muted">See the top-rated players and review your online games.</p><div class="puzzlebox"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin:0">Player leaderboard</h3><button class="toolbtn" id="refreshCommunity">↻ Refresh</button></div><div id="leaderboardList" class="lesson-list"><p class="muted">Loading players…</p></div></div><div class="puzzlebox" style="margin-top:14px"><h3>My online games</h3><div id="myGamesList" class="lesson-list"><p class="muted">Sign in to see your games.</p></div></div></div></section>
-<section class="pageview" id="page-friends"><div class="simplepage"><h2>👥 Friends</h2><p class="muted">Find MaxChess players and send friend requests. You must be signed in.</p><div class="puzzlebox"><h3>Find a player</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="friendSearchInput" placeholder="Enter username" style="flex:1;min-width:180px;padding:10px;background:#171914;color:var(--text);border:1px solid #4a5041;border-radius:6px"><button class="greenbtn" id="friendSearchBtn" style="margin:0;width:auto">Search</button></div><div id="friendSearchResults" class="lesson-list"></div></div><div class="puzzlebox" style="margin-top:14px"><h3>Friend requests</h3><div id="friendRequests" class="lesson-list"><p class="muted">Sign in to view requests.</p></div></div><div class="puzzlebox" style="margin-top:14px"><h3>My friends</h3><div id="myFriends" class="lesson-list"><p class="muted">Your accepted friends appear here.</p></div></div></div></section>
-<section class="pageview" id="page-tournaments"><div class="simplepage"><h2>🏆 Tournaments</h2><p class="muted">Create a tournament and let other MaxChess players join. Tournament pairing and automatic scoring are not available yet.</p><div class="puzzlebox"><h3>Create a tournament</h3><input id="tournamentName" maxlength="70" placeholder="Tournament name" style="width:100%;padding:10px;background:#171914;color:var(--text);border:1px solid #4a5041;border-radius:6px"><textarea id="tournamentDescription" rows="2" placeholder="Description (optional)" style="width:100%;margin-top:8px;padding:10px;background:#171914;color:var(--text);border:1px solid #4a5041;border-radius:6px"></textarea><div class="selectrow"><label for="tournamentTime">Time control</label><select id="tournamentTime"><option>3+0</option><option>5+0</option><option selected>10+0</option><option>15+10</option></select></div><button class="greenbtn" id="createTournament">Create tournament</button><div id="tournamentNotice" class="desc" aria-live="polite"></div></div><div class="puzzlebox" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><h3>Upcoming tournaments</h3><button class="toolbtn" id="refreshTournaments">↻ Refresh</button></div><div id="tournamentList" class="lesson-list"><p class="muted">Loading tournaments…</p></div></div></div></section>
+<section class="pageview" id="page-friends"><div class="simplepage"><h2>👥 Friends</h2><p class="muted">Find MaxChess players and send friend requests. You must be signed in.</p><div class="puzzlebox"><h3>Find a player</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="friendSearchInput" placeholder="Enter username" style="flex:1;min-width:180px;padding:10px;background:#1f1e1c;color:var(--text);border:1px solid #3c3a37;border-radius:6px"><button class="greenbtn" id="friendSearchBtn" style="margin:0;width:auto">Search</button></div><div id="friendSearchResults" class="lesson-list"></div></div><div class="puzzlebox" style="margin-top:14px"><h3>Friend requests</h3><div id="friendRequests" class="lesson-list"><p class="muted">Sign in to view requests.</p></div></div><div class="puzzlebox" style="margin-top:14px"><h3>My friends</h3><div id="myFriends" class="lesson-list"><p class="muted">Your accepted friends appear here.</p></div></div></div></section>
+<section class="pageview" id="page-tournaments"><div class="simplepage"><h2>🏆 Tournaments</h2><p class="muted">Create a tournament and let other MaxChess players join. Tournament pairing and automatic scoring are not available yet.</p><div class="puzzlebox"><h3>Create a tournament</h3><input id="tournamentName" maxlength="70" placeholder="Tournament name" style="width:100%;padding:10px;background:#1f1e1c;color:var(--text);border:1px solid #3c3a37;border-radius:6px"><textarea id="tournamentDescription" rows="2" placeholder="Description (optional)" style="width:100%;margin-top:8px;padding:10px;background:#1f1e1c;color:var(--text);border:1px solid #3c3a37;border-radius:6px"></textarea><div class="selectrow"><label for="tournamentTime">Time control</label><select id="tournamentTime"><option>3+0</option><option>5+0</option><option selected>10+0</option><option>15+10</option></select></div><button class="greenbtn" id="createTournament">Create tournament</button><div id="tournamentNotice" class="desc" aria-live="polite"></div></div><div class="puzzlebox" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><h3>Upcoming tournaments</h3><button class="toolbtn" id="refreshTournaments">↻ Refresh</button></div><div id="tournamentList" class="lesson-list"><p class="muted">Loading tournaments…</p></div></div></div></section>
 <section class="pageview" id="page-about"><div class="simplepage"><h2>About MaxChess</h2><div class="puzzlebox"><p><b>Chess should be fun and accessible.</b></p><p>MaxChess is a free chess-learning project with a playable board, beginner lessons, board themes, and move history. No subscription is needed.</p><p class="muted">This is an independent project inspired by the clean, community-focused style of modern chess sites; it is not affiliated with Lichess.</p></div></div></section>
 </main>
 <aside class="rightbar"><h2>Your chess dashboard</h2><div class="mini-card"><b>♟ Your rating</b><div class="rating-number" id="ratingNumber">1200</div><div class="rating-note" id="ratingRecord">0 wins · 0 losses · 0 draws</div><p>Your profile rating is saved online. Ranked rating updates are coming next.</p></div><div class="mini-card"><div style="font-size:25px">♟</div><b>Welcome to MaxChess</b><p>Play a game, learn a skill, and keep improving one move at a time.</p><button class="mini-link" data-rightgo="play">Start playing →</button></div><div class="mini-card"><b>Quick learning plan</b><p>New to chess? Follow these steps in order.</p><div class="right-stat"><span>Learn the pieces</span><b>01</b></div><div class="right-stat"><span>Protect your king</span><b>02</b></div><div class="right-stat"><span>Control the center</span><b>03</b></div><button class="mini-link" data-rightgo="learn">Open lessons →</button></div><div class="mini-card"><b>Game tools</b><p>Change the board and pieces to suit you.</p><button class="mini-link" id="rightTheme">Customize appearance →</button></div><div class="mini-card"><b>Made for everyone</b><p>Free to play. Friendly to beginners. Built for curious chess players.</p></div></aside>
@@ -110,14 +294,14 @@
 
 <div class="account-modal" id="accountModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
  <div class="account-card">
-  <h2 id="accountTitle">Create your MaxChess profile</h2>
+  <h2 id="accountTitle">Register</h2>
   <p id="accountIntro">Choose a username to personalize MaxChess on this device.</p>
   <form id="accountForm">
    <label for="accountEmail">Email</label><input id="accountEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
    <label for="accountUsername">Username</label><input id="accountUsername" name="username" maxlength="30" minlength="3" autocomplete="nickname" placeholder="The Max of Chess" required>
    <label for="accountPassword">Password</label><input id="accountPassword" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" required>
-   <div class="account-actions"><button class="greenbtn" type="submit" style="margin:0">Create account</button><button class="account-close" type="button" id="closeAccount">Cancel</button></div>
-   <p style="margin:12px 0 0"><button type="button" class="mini-link" id="switchAccountMode">Already have an account? Log in</button></p>
+   <div class="account-actions"><button class="greenbtn" type="submit" style="margin:0">Register</button><button class="account-close" type="button" id="closeAccount">Cancel</button></div>
+   <p style="margin:12px 0 0"><button type="button" class="mini-link" id="switchAccountMode">Already have an account? Sign in</button></p>
   </form>
   <details style="margin-top:18px;border-top:1px solid var(--line);padding-top:12px"><summary style="cursor:pointer;font-weight:700">Connection settings (advanced)</summary>
   <h3 style="margin:10px 0 6px;font-size:16px">Connect MaxChess accounts</h3>
@@ -126,7 +310,7 @@
   <label for="supabaseKey">Supabase public anon / publishable key</label><input id="supabaseKey" type="password" placeholder="sb_publishable_… or public anon key" autocomplete="off">
   <div class="account-actions"><button type="button" class="greenbtn" id="connectAuth" style="margin:0">Connect account service</button></div>
   </details>
-  <p class="account-notice" id="authStatus">Online sign-in is not connected yet. Your password will not be saved until a real service is connected.</p>
+  <p class="account-notice" id="authStatus"></p>
  </div>
 </div>
 
@@ -204,7 +388,7 @@
  $('exportFEN').onclick=()=>{if(!game)return;const fen=game.fen();if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(fen).then(()=>note('FEN copied to clipboard.'),()=>{downloadText('maxchess-position.fen',fen+'\n','text/plain');note('FEN position downloaded.')})}else{downloadText('maxchess-position.fen',fen+'\n','text/plain');note('FEN position downloaded.')}};
  $('timeControl').onchange=()=>{clockInitial=Number($('timeControl').value)||0;whiteSeconds=blackSeconds=clockInitial;clockStarted=false;clockPaused=false;flaggedSide=null;paintClocks();note('Time control changed. Start a new game to use it.')};
 
- function navigate(page){document.querySelectorAll('.pageview').forEach(v=>v.classList.remove('active'));let p=$('page-'+page);if(p)p.classList.add('active');document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='puzzles')$('puzzleRating').textContent=localStorage.getItem('maxchess_puzzle_rating')||'800';if(page==='community')renderCommunity();if(page==='friends')loadFriends();if(page==='tournaments')loadTournaments();if(page==='play')window.scrollTo({top:0,behavior:'smooth'})}
+ function navigate(page){document.querySelectorAll('.pageview').forEach(v=>v.classList.remove('active'));let p=$('page-'+page);if(p)p.classList.add('active');document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='puzzles')$('puzzleRating').textContent=localStorage.getItem('maxchess_puzzle_rating')||'800';if(page==='community')renderCommunity();if(page==='friends')loadFriends();if(page==='tournaments')loadTournaments();if(page==='play')window.scrollTo({top:0,behavior:'smooth'});if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
  const puzzleFen='7k/8/5KQ1/8/8/8/8/8 w - - 0 1';function beginPuzzle(){if(!game)return;puzzleMode=true;computerMode=false;onlineGameId=null;selected=null;legal=[];lastMove=null;flipped=false;game.load(puzzleFen);clockStarted=false;clockPaused=true;$('puzzleRating').textContent=localStorage.getItem('maxchess_puzzle_rating')||'800';$('puzzleFeedback').textContent='White to move: find mate in one.';render();navigate('play');note('Puzzle loaded. Find Qg7 checkmate!')}$('puzzleStart').onclick=beginPuzzle;$('puzzleReset').onclick=()=>{beginPuzzle();navigate('puzzles')};$('puzzleHint').onclick=()=>{$('puzzleFeedback').textContent='Hint: move the queen one square forward, to a square your king protects.'};$('puzzleSolution').onclick=()=>{$('puzzleFeedback').textContent='Solution: Qg7# — the queen is protected by your king.'};document.querySelectorAll('[data-homegoto="puzzles"]').forEach(b=>b.onclick=()=>{navigate('puzzles');$('puzzleRating').textContent=localStorage.getItem('maxchess_puzzle_rating')||'800'});
  $('homePlay').onclick=()=>navigate('play');$('homeComputer').onclick=()=>{reset(true);navigate('play')};$('homeLocal').onclick=()=>{reset(false);navigate('play')};$('homePlayComputer').onclick=()=>{reset(true);navigate('play')};document.querySelectorAll('[data-homegoto]').forEach(b=>b.onclick=()=>navigate(b.dataset.homegoto));
  document.querySelectorAll('.navitem').forEach(b=>b.onclick=()=>navigate(b.dataset.page));document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>navigate(b.dataset.goto));document.querySelectorAll('[data-rightgo]').forEach(b=>b.onclick=()=>navigate(b.dataset.rightgo));
@@ -222,10 +406,10 @@
  let authClient=null,authMode='signup',authUser=null,onlineGameId=null,onlineColor=null,onlinePoll=null,onlineBusy=false;
  function savedAuthConfig(){try{return JSON.parse(localStorage.getItem('maxchess_auth_config')||'null')}catch(e){return null}}
  function setAuthStatus(msg){if(authStatus)authStatus.textContent=msg}
- function setAuthMode(mode){authMode=mode;accountUsername.required=mode!=='login';accountUsername.style.display=mode==='login'?'none':'';accountForm.querySelector('label[for="accountUsername"]').style.display=mode==='login'?'none':'';$('accountTitle').textContent=mode==='login'?'Log in to MaxChess':'Create your MaxChess account';$('accountIntro').textContent=mode==='login'?'Enter the email and password you used when you created your account.':'Choose a username and email to create your online MaxChess account.';accountPassword.autocomplete=mode==='login'?'current-password':'new-password';accountForm.querySelector('button[type="submit"]').textContent=mode==='login'?'Log in':'Create account';$('switchAccountMode').textContent=mode==='login'?'New to MaxChess? Create an account':'Already have an account? Log in'}
+ function setAuthMode(mode){authMode=mode;const login=mode==='login';accountUsername.required=!login;accountUsername.style.display=login?'none':'';accountForm.querySelector('label[for="accountUsername"]').style.display=login?'none':'';$('accountTitle').textContent=login?'Sign in':'Register';$('accountIntro').textContent=login?'':'Choose a username, then enter your email and a password.';accountPassword.autocomplete=login?'current-password':'new-password';accountForm.querySelector('button[type="submit"]').textContent=login?'Sign in':'Register';$('switchAccountMode').textContent=login?'Register':'Already have an account? Sign in'}
  paintRating();
- async function paintProfile(){const active=!!authUser;$('loginBtn').textContent=active?(authUser.user_metadata?.username||'Profile'):'Log in';$('signupBtn').textContent=active?'Log out':'Sign up';$('signupBtn').classList.toggle('profile-pill',active);if(active&&authClient){const p=await authClient.from('profiles').select('username,rating,wins,losses,draws').eq('id',authUser.id).maybeSingle();if(p.data){ratingData.rating=p.data.rating;ratingData.wins=p.data.wins;ratingData.losses=p.data.losses;ratingData.draws=p.data.draws;paintRating();if($('homeRatingNumber'))$('homeRatingNumber').textContent=p.data.rating;$('loginBtn').textContent=p.data.username||authUser.user_metadata?.username||'Profile'}}}
- async function connectAuth(url,key,save=true){if(!window.supabase?.createClient){setAuthStatus('Could not load the Supabase client library. Refresh and try again.');return false}if(!/^https:\/\/[^/]+\.supabase\.co\/?$/.test(url)||!key.trim()){setAuthStatus('Enter a valid Supabase project URL and public anon/publishable key.');return false}try{authClient=window.supabase.createClient(url.replace(/\/$/,''),key.trim());const {data,error}=await authClient.auth.getSession();if(error)throw error;authUser=data.session?.user||null;if(save)localStorage.setItem('maxchess_auth_config',JSON.stringify({url:url.replace(/\/$/,''),key:key.trim()}));authClient.auth.onAuthStateChange((_event,session)=>{authUser=session?.user||null;paintProfile();loadFriends();loadTournaments()});paintProfile();setAuthStatus('Connected to MaxChess accounts and online games. You can now create an account or sign in.');return true}catch(e){authClient=null;setAuthStatus('Connection failed: '+(e.message||'check your project URL and public key'));return false}}
+ async function paintProfile(){const active=!!authUser;$('loginBtn').textContent=active?(authUser.user_metadata?.username||'Profile'):'Sign in';$('signupBtn').textContent=active?'Sign out':'Register';$('signupBtn').classList.toggle('profile-pill',active);if(active&&authClient){const p=await authClient.from('profiles').select('username,rating,wins,losses,draws').eq('id',authUser.id).maybeSingle();if(p.data){ratingData.rating=p.data.rating;ratingData.wins=p.data.wins;ratingData.losses=p.data.losses;ratingData.draws=p.data.draws;paintRating();if($('homeRatingNumber'))$('homeRatingNumber').textContent=p.data.rating;$('loginBtn').textContent=p.data.username||authUser.user_metadata?.username||'Profile'}}}
+ async function connectAuth(url,key,save=true){if(!window.supabase?.createClient){setAuthStatus('Could not load the Supabase client library. Refresh and try again.');return false}if(!/^https:\/\/[^/]+\.supabase\.co\/?$/.test(url)||!key.trim()){setAuthStatus('Enter a valid Supabase project URL and public anon/publishable key.');return false}try{authClient=window.supabase.createClient(url.replace(/\/$/,''),key.trim());const {data,error}=await authClient.auth.getSession();if(error)throw error;authUser=data.session?.user||null;if(save)localStorage.setItem('maxchess_auth_config',JSON.stringify({url:url.replace(/\/$/,''),key:key.trim()}));authClient.auth.onAuthStateChange((_event,session)=>{authUser=session?.user||null;paintProfile();loadFriends();loadTournaments()});paintProfile();setAuthStatus('');return true}catch(e){authClient=null;setAuthStatus('Connection failed: '+(e.message||'check your project URL and public key'));return false}}
 
 
  async function renderCommunity(){
@@ -235,7 +419,7 @@
   if(top.error){board.textContent='Could not load leaderboard: '+top.error.message}else if(!top.data?.length){board.innerHTML='<p class="muted">No players yet. Be the first to join!</p>'}else{
    board.innerHTML=top.data.map((p,i)=>'<div class="lesson" style="display:flex;justify-content:space-between;gap:12px;align-items:center"><span><b>#'+(i+1)+' '+escapeCommunity(p.username)+'</b><small>'+p.wins+' wins · '+p.losses+' losses · '+p.draws+' draws</small></span><strong style="color:var(--green2)">'+p.rating+'</strong></div>').join('');
   }
-  if(!authUser){history.innerHTML='<p class="muted">Log in to see your online games.</p>';return}
+  if(!authUser){history.innerHTML='<p class="muted">Sign in to see your online games.</p>';return}
   const mine=await authClient.from('games').select('id,white_player,black_player,status,time_control,created_at,pgn').or('white_player.eq.'+authUser.id+',black_player.eq.'+authUser.id).order('created_at',{ascending:false}).limit(20);
   if(mine.error){history.textContent='Could not load games: '+mine.error.message;return}
   if(!mine.data?.length){history.innerHTML='<p class="muted">No online games yet. Find an opponent to start your history.</p>';return}
@@ -244,7 +428,7 @@
 
 
  async function loadFriends(){
-  const req=$('friendRequests'),friends=$('myFriends');if(!authClient||!authUser){req.innerHTML='<p class="muted">Log in to view friend requests.</p>';friends.innerHTML='<p class="muted">Log in to view friends.</p>';return}
+  const req=$('friendRequests'),friends=$('myFriends');if(!authClient||!authUser){req.innerHTML='<p class="muted">Sign in to view friend requests.</p>';friends.innerHTML='<p class="muted">Sign in to view friends.</p>';return}
   const q=await authClient.from('friendships').select('id,requester_id,addressee_id,status,created_at').or('requester_id.eq.'+authUser.id+',addressee_id.eq.'+authUser.id).order('created_at',{ascending:false});
   if(q.error){req.textContent='Could not load friend requests: '+q.error.message;friends.textContent='Could not load friends.';return}
   const rows=q.data||[],ids=[...new Set(rows.map(x=>x.requester_id===authUser.id?x.addressee_id:x.requester_id))];
@@ -255,9 +439,9 @@
   req.querySelectorAll('[data-friend-decline]').forEach(b=>b.onclick=async()=>{const z=await authClient.from('friendships').update({status:'declined',updated_at:new Date().toISOString()}).eq('id',b.dataset.friendDecline);if(z.error)note(z.error.message);else loadFriends()});
   const accepted=rows.filter(x=>x.status==='accepted');friends.innerHTML=accepted.length?accepted.map(x=>{const id=x.requester_id===authUser.id?x.addressee_id:x.requester_id,p=names[id]||{};return '<div class="lesson"><b>'+escapeCommunity(p.username||'Player')+'</b><small>Rating: '+(p.rating??1200)+'</small></div>'}).join(''):'<p class="muted">No friends yet. Search for a player above.</p>';
  }
- $('friendSearchBtn').onclick=async()=>{const term=$('friendSearchInput').value.trim();const out=$('friendSearchResults');if(!authClient||!authUser){out.textContent='Log in first.';return}if(term.length<2){out.textContent='Enter at least 2 letters.';return}const q=await authClient.from('profiles').select('id,username,rating').ilike('username','%'+term.replace(/[%_]/g,'')+'%').neq('id',authUser.id).limit(10);if(q.error){out.textContent=q.error.message;return}if(!q.data?.length){out.innerHTML='<p class="muted">No matching players found.</p>';return}out.innerHTML=q.data.map(p=>'<div class="lesson" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span><b>'+escapeCommunity(p.username)+'</b><small>Rating '+p.rating+'</small></span><button class="toolbtn" data-friend-add="'+p.id+'">Add friend</button></div>').join('');out.querySelectorAll('[data-friend-add]').forEach(b=>b.onclick=async()=>{const z=await authClient.from('friendships').insert({requester_id:authUser.id,addressee_id:b.dataset.friendAdd});if(z.error)note(z.error.code==='23505'?'Friend request already exists.':z.error.message);else{note('Friend request sent.');b.disabled=true;b.textContent='Sent'}})};
- async function loadTournaments(){const out=$('tournamentList');if(!authClient||!authUser){out.innerHTML='<p class="muted">Log in to view and join tournaments.</p>';return}const q=await authClient.from('tournaments').select('id,name,description,time_control,status,starts_at,created_by').in('status',['upcoming','in_progress']).order('starts_at',{ascending:true}).limit(30);if(q.error){out.textContent='Could not load tournaments: '+q.error.message;return}if(!q.data?.length){out.innerHTML='<p class="muted">No tournaments yet. Create the first one!</p>';return}const ids=q.data.map(x=>x.id),e=await authClient.from('tournament_players').select('tournament_id,user_id').in('tournament_id',ids);const entries=e.data||[];out.innerHTML=q.data.map(t=>{const n=entries.filter(x=>x.tournament_id===t.id).length,joined=entries.some(x=>x.tournament_id===t.id&&x.user_id===authUser.id);return '<div class="lesson"><b>'+escapeCommunity(t.name)+'</b><small>'+escapeCommunity(t.description||'No description')+' · '+escapeCommunity(t.time_control)+' · '+new Date(t.starts_at).toLocaleString()+' · '+n+' players</small><button class="toolbtn" data-tournament-join="'+t.id+'" '+(joined?'disabled':'')+'>'+(joined?'Joined':'Join tournament')+'</button></div>'}).join('');out.querySelectorAll('[data-tournament-join]').forEach(b=>b.onclick=async()=>{const z=await authClient.from('tournament_players').insert({tournament_id:b.dataset.tournamentJoin,user_id:authUser.id});if(z.error)note(z.error.message);else{note('You joined the tournament!');loadTournaments()}})}
- $('createTournament').onclick=async()=>{if(!authClient||!authUser){note('Log in to create a tournament.');return}const name=$('tournamentName').value.trim();if(name.length<3){$('tournamentNotice').textContent='Tournament name must be at least 3 characters.';return}const z=await authClient.from('tournaments').insert({name,description:$('tournamentDescription').value.trim(),time_control:$('tournamentTime').value,created_by:authUser.id,starts_at:new Date(Date.now()+3600000).toISOString()});if(z.error){$('tournamentNotice').textContent='Could not create tournament: '+z.error.message;return}$('tournamentNotice').textContent='Tournament created! It starts in about one hour.';$('tournamentName').value='';$('tournamentDescription').value='';loadTournaments()};
+ $('friendSearchBtn').onclick=async()=>{const term=$('friendSearchInput').value.trim();const out=$('friendSearchResults');if(!authClient||!authUser){out.textContent='Sign in first.';return}if(term.length<2){out.textContent='Enter at least 2 letters.';return}const q=await authClient.from('profiles').select('id,username,rating').ilike('username','%'+term.replace(/[%_]/g,'')+'%').neq('id',authUser.id).limit(10);if(q.error){out.textContent=q.error.message;return}if(!q.data?.length){out.innerHTML='<p class="muted">No matching players found.</p>';return}out.innerHTML=q.data.map(p=>'<div class="lesson" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span><b>'+escapeCommunity(p.username)+'</b><small>Rating '+p.rating+'</small></span><button class="toolbtn" data-friend-add="'+p.id+'">Add friend</button></div>').join('');out.querySelectorAll('[data-friend-add]').forEach(b=>b.onclick=async()=>{const z=await authClient.from('friendships').insert({requester_id:authUser.id,addressee_id:b.dataset.friendAdd});if(z.error)note(z.error.code==='23505'?'Friend request already exists.':z.error.message);else{note('Friend request sent.');b.disabled=true;b.textContent='Sent'}})};
+ async function loadTournaments(){const out=$('tournamentList');if(!authClient||!authUser){out.innerHTML='<p class="muted">Sign in to view and join tournaments.</p>';return}const q=await authClient.from('tournaments').select('id,name,description,time_control,status,starts_at,created_by').in('status',['upcoming','in_progress']).order('starts_at',{ascending:true}).limit(30);if(q.error){out.textContent='Could not load tournaments: '+q.error.message;return}if(!q.data?.length){out.innerHTML='<p class="muted">No tournaments yet. Create the first one!</p>';return}const ids=q.data.map(x=>x.id),e=await authClient.from('tournament_players').select('tournament_id,user_id').in('tournament_id',ids);const entries=e.data||[];out.innerHTML=q.data.map(t=>{const n=entries.filter(x=>x.tournament_id===t.id).length,joined=entries.some(x=>x.tournament_id===t.id&&x.user_id===authUser.id);return '<div class="lesson"><b>'+escapeCommunity(t.name)+'</b><small>'+escapeCommunity(t.description||'No description')+' · '+escapeCommunity(t.time_control)+' · '+new Date(t.starts_at).toLocaleString()+' · '+n+' players</small><button class="toolbtn" data-tournament-join="'+t.id+'" '+(joined?'disabled':'')+'>'+(joined?'Joined':'Join tournament')+'</button></div>'}).join('');out.querySelectorAll('[data-tournament-join]').forEach(b=>b.onclick=async()=>{const z=await authClient.from('tournament_players').insert({tournament_id:b.dataset.tournamentJoin,user_id:authUser.id});if(z.error)note(z.error.message);else{note('You joined the tournament!');loadTournaments()}})}
+ $('createTournament').onclick=async()=>{if(!authClient||!authUser){note('Sign in to create a tournament.');return}const name=$('tournamentName').value.trim();if(name.length<3){$('tournamentNotice').textContent='Tournament name must be at least 3 characters.';return}const z=await authClient.from('tournaments').insert({name,description:$('tournamentDescription').value.trim(),time_control:$('tournamentTime').value,created_by:authUser.id,starts_at:new Date(Date.now()+3600000).toISOString()});if(z.error){$('tournamentNotice').textContent='Could not create tournament: '+z.error.message;return}$('tournamentNotice').textContent='Tournament created! It starts in about one hour.';$('tournamentName').value='';$('tournamentDescription').value='';loadTournaments()};
  $('refreshTournaments').onclick=loadTournaments;
  async function loadGameChat(){const panel=$('gameChatPanel');if(!panel)return;if(!authClient||!authUser||!onlineGameId){panel.classList.add('hidden');return}panel.classList.remove('hidden');const q=await authClient.from('game_chat').select('id,sender_id,message,created_at').eq('game_id',onlineGameId).order('created_at',{ascending:true}).limit(60);const box=$('gameChatMessages');if(q.error){box.textContent='Chat unavailable: '+q.error.message;return}box.innerHTML=(q.data||[]).map(m=>'<div style="padding:4px 0"><b>'+ (m.sender_id===authUser.id?'You':'Opponent')+':</b> '+escapeCommunity(m.message)+'</div>').join('')||'<p class="muted">Say hello to your opponent.</p>';box.scrollTop=box.scrollHeight}
  $('sendGameChat').onclick=async()=>{const input=$('gameChatInput'),message=input.value.trim();if(!message||!onlineGameId||!authUser)return;const z=await authClient.from('game_chat').insert({game_id:onlineGameId,sender_id:authUser.id,message});if(z.error){note('Chat error: '+z.error.message);return}input.value='';loadGameChat()};
@@ -316,7 +500,7 @@
   if(q.data?.length){await loadOnlineGame(q.data[0]);onlineBusy=false}
  }
  async function startOnlineSearch(){
-  if(!authClient||!authUser){note('Log in or create a MaxChess account first.');openAccount('login');return}
+  if(!authClient||!authUser){note('Sign in or create a MaxChess account first.');openAccount('login');return}
   if(onlineBusy)return;
   if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}
   onlineBusy=true;onlineGameId=null;onlineColor=null;
@@ -337,16 +521,21 @@
  };
  function openAccount(mode){setAuthMode(mode||'signup');accountUsername.value='';accountEmail.value='';accountPassword.value='';accountModal.classList.add('open');accountUsername.focus()}
  $('loginBtn').onclick=()=>{if(authUser){note('You are signed in as '+(authUser.user_metadata?.username||authUser.email)+'.');return}openAccount('login')};
- $('signupBtn').onclick=async()=>{if(authUser){if(authClient){const {error}=await authClient.auth.signOut();if(error){note('Could not sign out: '+error.message);return}authUser=null;paintProfile();note('Logged out of MaxChess.')}return}openAccount('signup')};
+ $('signupBtn').onclick=async()=>{if(authUser){if(authClient){const {error}=await authClient.auth.signOut();if(error){note('Could not sign out: '+error.message);return}authUser=null;paintProfile();note('Signed out of MaxChess.')}return}openAccount('signup')};
  $('connectAuth').onclick=async()=>{const ok=await connectAuth(supabaseUrl.value.trim(),supabaseKey.value.trim());if(ok)note('MaxChess account service connected.')};
  $('switchAccountMode').onclick=()=>{setAuthMode(authMode==='login'?'signup':'login');setAuthStatus(authMode==='login'?'Enter your account details below.':'Create your account below.');accountPassword.value='';accountUsername.value=''};
  $('closeAccount').onclick=()=>accountModal.classList.remove('open');
  accountModal.addEventListener('click',e=>{if(e.target===accountModal)accountModal.classList.remove('open')});
  document.addEventListener('keydown',e=>{if(e.key==='Escape')accountModal.classList.remove('open')});
- accountForm.onsubmit=async e=>{e.preventDefault();if(!authClient){setAuthStatus('Connect your Supabase project below before signing up or logging in.');accountPassword.value='';return}const email=accountEmail.value.trim(),password=accountPassword.value,username=accountUsername.value.trim();if(password.length<8){setAuthStatus('Use a password with at least 8 characters.');return}try{if(authMode==='login'){const {data,error}=await authClient.auth.signInWithPassword({email,password});if(error)throw error;authUser=data.user;accountModal.classList.remove('open');paintProfile();note('Welcome back to MaxChess!')}else{if(username.length<3||username.length>30){setAuthStatus('Username must be 3–30 characters.');return}const {data,error}=await authClient.auth.signUp({email,password,options:{data:{username},emailRedirectTo:'https://mbeaton36-commits.github.io/max-chess/'}});if(error)throw error;authUser=data.session?.user||null;if(data.session){accountModal.classList.remove('open');paintProfile();note('Welcome to MaxChess, '+username+'!')}else{setAuthStatus('Check your email to confirm your account, then log in.');accountPassword.value=''}}}catch(err){const msg=err.message||'Authentication failed.';if(authMode==='login'&&/invalid login credentials|invalid_credentials/i.test(msg)){setAuthStatus('That email/password did not match an existing account. If you have not signed up yet, click “New to MaxChess? Create an account” below and create it first.');}else if(authMode==='signup'&&/already registered|user already exists/i.test(msg)){setAuthStatus('An account with this email already exists. Click “Already have an account? Log in” below.');}else{setAuthStatus(msg)}accountPassword.value=''}};
+ accountForm.onsubmit=async e=>{e.preventDefault();if(!authClient){setAuthStatus('Connect your Supabase project below before signing up or logging in.');accountPassword.value='';return}const email=accountEmail.value.trim(),password=accountPassword.value,username=accountUsername.value.trim();if(password.length<8){setAuthStatus('Use a password with at least 8 characters.');return}try{if(authMode==='login'){const {data,error}=await authClient.auth.signInWithPassword({email,password});if(error)throw error;authUser=data.user;accountModal.classList.remove('open');paintProfile();note('Welcome back to MaxChess!')}else{if(username.length<3||username.length>30){setAuthStatus('Username must be 3–30 characters.');return}const {data,error}=await authClient.auth.signUp({email,password,options:{data:{username},emailRedirectTo:'https://mbeaton36-commits.github.io/max-chess/'}});if(error)throw error;authUser=data.session?.user||null;if(data.session){accountModal.classList.remove('open');paintProfile();note('Welcome to MaxChess, '+username+'!')}else{setAuthStatus('Check your email to confirm your account, then log in.');accountPassword.value=''}}}catch(err){const msg=err.message||'Authentication failed.';if(authMode==='login'&&/invalid login credentials|invalid_credentials/i.test(msg)){setAuthStatus('That email/password did not match an existing account. If you have not signed up yet, click “New to MaxChess? Create an account” below and create it first.');}else if(authMode==='signup'&&/already registered|user already exists/i.test(msg)){setAuthStatus('An account with this email already exists. Click “Already have an account? Sign in” below.');}else{setAuthStatus(msg)}accountPassword.value=''}};
  const cfg=savedAuthConfig()||{url:'https://bvukakfhkebpsviehirr.supabase.co',key:'sb_publishable_YTyppUkZGBFHmaNOg2ZSMg_xiFJw2rG'};supabaseUrl.value=cfg.url||'';supabaseKey.value=cfg.key||'';connectAuth(cfg.url||'',cfg.key||'',true);
  paintProfile();
  document.querySelectorAll('[data-learnpage]').forEach(()=>{});
+ $('brandHome').onclick=()=>navigate('home');$('brandHome').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigate('home')}};
+ document.querySelectorAll('.tc-btn').forEach(b=>b.onclick=()=>{$('timeControl').value=b.dataset.tc;reset(false);navigate('play')});
+ (function(){const el=document.querySelector('.home-board-art');if(!el)return;const fen='rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R',g={P:'♙',N:'♘',B:'♗',R:'♖',Q:'♕',K:'♔',p:'♟',n:'♞',b:'♝',r:'♜',q:'♛',k:'♚'};
+  function cell(r,c,ch){const d=document.createElement('div');d.className='hb '+((r+c)%2===0?'light':'dark');if(ch){const sp=document.createElement('span'),w=ch===ch.toUpperCase();sp.textContent=g[ch];sp.style.color=w?'#fffef4':'#22231e';sp.style.textShadow=w?'0 1px 2px #222,1px 0 #222,-1px 0 #222,0 -1px #222':'0 1px 1px #ffffff77';d.appendChild(sp)}el.appendChild(d)}
+  fen.split('/').forEach((row,r)=>{let c=0;for(const ch of row){if(/\d/.test(ch)){for(let i=0;i<Number(ch);i++)cell(r,c++,'')}else cell(r,c++,ch)}})})();
  if(!game){$('statusTitle').textContent='Could not load chess rules';$('statusText').textContent='Check your internet connection and reload.'}
  render();
 })();
