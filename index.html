@@ -167,6 +167,12 @@ select.toolbtn{background:var(--panel2);border:0}
 .account-notice{font-size:12px;color:var(--gold)!important;margin-top:14px}
 .account-notice:empty{display:none}
 
+#fxCanvas{position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:40}
+@keyframes boardshake{0%,100%{transform:translate(0,0)}15%{transform:translate(-7px,3px)}30%{transform:translate(6px,-4px)}45%{transform:translate(-5px,-3px)}60%{transform:translate(4px,4px)}75%{transform:translate(-2px,2px)}}
+@keyframes boardshake-big{0%,100%{transform:translate(0,0) rotate(0)}10%{transform:translate(-12px,5px) rotate(-.6deg)}25%{transform:translate(11px,-7px) rotate(.6deg)}40%{transform:translate(-9px,-5px) rotate(-.4deg)}55%{transform:translate(8px,7px) rotate(.4deg)}70%{transform:translate(-5px,3px)}85%{transform:translate(3px,-2px)}}
+.board.shake{animation:boardshake .4s}
+.board.shake-big{animation:boardshake-big .7s}
+@media(prefers-reduced-motion:reduce){.board.shake,.board.shake-big{animation:none}}
 .danger{background:#b3382f;color:#fff}
 .danger:hover{background:#c8453b}
 .danger:disabled{opacity:.55;cursor:not-allowed}
@@ -272,6 +278,7 @@ select.toolbtn{background:var(--panel2);border:0}
     <h3 style="font-size:14px;margin:15px 0 8px">Move list</h3><div class="moves" id="moves"><span class="muted">Moves will appear here.</span></div>
     <div class="selectrow"><label for="pieceStyle">Piece style</label><select id="pieceStyle"><option value="classic">Classic symbols</option><option value="bold">Bold symbols</option><option value="emoji">Friendly style</option></select></div>
     <div class="selectrow"><label for="boardTheme">Board theme</label><select id="boardTheme"><option value="brown" selected>Brown</option><option value="green">Green</option><option value="blue">Blue</option><option value="mono">Black & white</option></select></div>
+    <div class="selectrow"><label for="fxMode">Fun effects</label><select id="fxMode"><option value="boom">Explosions</option><option value="boomsound">Explosions + sound</option><option value="off">Off</option></select></div>
     <div class="toast" id="toast" role="status"></div>
    </div>
    <div class="tabcontent hidden" id="learnTab"><h2>Learn as you play</h2><p class="desc">Short lessons to help you improve.</p>
@@ -376,7 +383,7 @@ select.toolbtn{background:var(--panel2);border:0}
  function tap(sq){
   if(!game||game.game_over()||thinking)return;if(flaggedSide){note('Time is up. Start a new game to play again.');return}if(onlineGameId&&game.turn()!==onlineColor){note('Wait for your opponent to move.');return}
   if(selected&&legal.some(m=>m.to===sq)){
-   const previousFen=game.fen();let move=game.move({from:selected,to:sq,promotion:'q'});if(move){clockStarted=true;lastMove={from:move.from,to:move.to};selected=null;legal=[];render();if(puzzleMode){if(move.san==='Qg7#'){puzzleMode=false;let pr=Number(localStorage.getItem('maxchess_puzzle_rating')||800)+12;localStorage.setItem('maxchess_puzzle_rating',String(pr));$('puzzleRating').textContent=pr;$('puzzleFeedback').textContent='Correct! Checkmate. +12 puzzle points.';note('Puzzle solved! Brilliant move.')}else{game.load(puzzleFen);selected=null;legal=[];lastMove=null;render();$('puzzleFeedback').textContent='Not quite. The position has been reset—try again.';note('Not the puzzle solution. Try again.')}}if(onlineGameId)saveOnlinePosition(move,previousFen);if(computerMode&&game.turn()==='b'&&!game.game_over())setTimeout(computerMove,350);return}
+   const previousFen=game.fen();let move=game.move({from:selected,to:sq,promotion:'q'});if(move){clockStarted=true;lastMove={from:move.from,to:move.to};selected=null;legal=[];render();playFx(move);if(puzzleMode){if(move.san==='Qg7#'){puzzleMode=false;let pr=Number(localStorage.getItem('maxchess_puzzle_rating')||800)+12;localStorage.setItem('maxchess_puzzle_rating',String(pr));$('puzzleRating').textContent=pr;$('puzzleFeedback').textContent='Correct! Checkmate. +12 puzzle points.';note('Puzzle solved! Brilliant move.')}else{game.load(puzzleFen);selected=null;legal=[];lastMove=null;render();$('puzzleFeedback').textContent='Not quite. The position has been reset—try again.';note('Not the puzzle solution. Try again.')}}if(onlineGameId)saveOnlinePosition(move,previousFen);if(computerMode&&game.turn()==='b'&&!game.game_over())setTimeout(computerMove,350);return}
   }
   let p=game.get(sq);if(p&&p.color===game.turn()){selected=sq;legal=game.moves({square:sq,verbose:true});render()}else{selected=null;legal=[];render()}
  }
@@ -385,7 +392,7 @@ select.toolbtn{background:var(--panel2);border:0}
   let ms=game.moves({verbose:true});if(!ms.length){thinking=false;return}
   // Beginner opponent: favor captures, checks, and safe-looking random legal moves.
   const captures=ms.filter(m=>m.captured),checks=ms.filter(m=>m.san.includes('+')||m.san.includes('#'));let pool=checks.length?checks:captures.length?captures:ms;
-  let m=pool[Math.floor(Math.random()*pool.length)];game.move(m);clockStarted=true;lastMove={from:m.from,to:m.to};selected=null;legal=[];thinking=false;render()
+  let m=pool[Math.floor(Math.random()*pool.length)];game.move(m);clockStarted=true;lastMove={from:m.from,to:m.to};selected=null;legal=[];thinking=false;render();playFx(m)
  }
  function reset(computer=false){if(!game)return;game.reset();ratingFinalized=false;puzzleMode=false;if(onlineGameId||onlinePoll){onlineGameId=null;onlineColor=null;onlineBusy=false;if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}$('opponentName').textContent='Black pieces';$('onlineStatus').textContent='Sign in, then find an opponent anywhere on MaxChess.';loadGameChat()}selected=null;legal=[];lastMove=null;computerMode=computer;clockInitial=Number($('timeControl').value)||0;whiteSeconds=blackSeconds=clockInitial;clockStarted=false;clockPaused=false;flaggedSide=null;render();note(computer?'Beginner computer game started.':'New game started.')}
  $('newGame').onclick=()=>reset(false);$('startGame').onclick=()=>reset(false);$('undo').onclick=()=>{if(onlineGameId){note('Takeback is not available in online games.');return}if(game.undo()){if(computerMode&&game.turn()==='b')game.undo();selected=null;legal=[];lastMove=null;render();note('Last move taken back.')}else note('There are no moves to take back yet.')};$('flip').onclick=()=>{flipped=!flipped;render()};$('playComputer').onclick=()=>{reset(true);navigate('play')};$('computerStart').onclick=()=>{reset(true);navigate('play')};$('analysisStart').onclick=()=>navigate('play');$('openingStart').onclick=()=>navigate('play');$('practiceStart').onclick=()=>navigate('play');$('puzzleStart').onclick=()=>navigate('play');
@@ -574,6 +581,72 @@ select.toolbtn{background:var(--panel2);border:0}
  (function(){const el=document.querySelector('.home-board-art');if(!el)return;const fen='rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R',g={P:'♙',N:'♘',B:'♗',R:'♖',Q:'♕',K:'♔',p:'♟',n:'♞',b:'♝',r:'♜',q:'♛',k:'♚'};
   function cell(r,c,ch){const d=document.createElement('div');d.className='hb '+((r+c)%2===0?'light':'dark');if(ch){const sp=document.createElement('span'),w=ch===ch.toUpperCase();sp.textContent=g[ch];sp.style.color=w?'#fffef4':'#22231e';sp.style.textShadow=w?'0 1px 2px #222,1px 0 #222,-1px 0 #222,0 -1px #222':'0 1px 1px #ffffff77';d.appendChild(sp)}el.appendChild(d)}
   fen.split('/').forEach((row,r)=>{let c=0;for(const ch of row){if(/\d/.test(ch)){for(let i=0;i<Number(ch);i++)cell(r,c++,'')}else cell(r,c++,ch)}})})();
+
+ /* ---------- fun effects: explosions, confetti, shake ---------- */
+ const fxKey='maxchess_fx';
+ let fxMode=(()=>{try{const v=localStorage.getItem(fxKey);if(v==='boom'||v==='boomsound'||v==='off')return v}catch(e){}return(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)?'off':'boom'})();
+ const fxCanvas=document.createElement('canvas');fxCanvas.id='fxCanvas';fxCanvas.setAttribute('aria-hidden','true');document.body.appendChild(fxCanvas);
+ const fctx=fxCanvas.getContext('2d');let parts=[],rings=[],flashes=[],fxRunning=false,fxLast=0,fxDpr=1,actx=null;
+ const fireColors=['#ffdf5d','#ffb02e','#ff7a1a','#ff4b1f','#fff3b0'],confColors=['#ff4d6d','#ffd23f','#3bceac','#4cc9f0','#b388ff','#ff9f1c'];
+ function fxResize(){fxDpr=Math.min(window.devicePixelRatio||1,2);fxCanvas.width=Math.round(innerWidth*fxDpr);fxCanvas.height=Math.round(innerHeight*fxDpr)}
+ fxResize();addEventListener('resize',fxResize);
+ function fxStart(){if(!fxRunning){fxRunning=true;fxLast=performance.now();requestAnimationFrame(fxFrame)}}
+ function burstAt(x,y,power,emoji){
+  const n=Math.round(26*power);
+  for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=(2+Math.random()*7)*Math.sqrt(power);parts.push({kind:'spark',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.5,g:.12,life:1,decay:.016+Math.random()*.02,r:2+Math.random()*3.5*Math.sqrt(power),c:fireColors[Math.floor(Math.random()*fireColors.length)]})}
+  for(let i=0;i<Math.round(8*power);i++){const a=Math.random()*Math.PI*2,sp=(1.5+Math.random()*5)*Math.sqrt(power);parts.push({kind:'chunk',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3,g:.22,life:1,decay:.012+Math.random()*.01,w:4+Math.random()*5,h:4+Math.random()*5,rot:Math.random()*6,vr:(Math.random()-.5)*.5,c:Math.random()<.5?'#2b2926':'#e8e8e8'})}
+  rings.push({x,y,r:4,max:50*power+30,life:1,c:'255,210,122'});
+  flashes.push({x,y,s:16*power+16,life:1,e:emoji||'💥'});
+  fxStart();
+ }
+ function confetti(){
+  for(let i=0;i<140;i++)parts.push({kind:'conf',x:Math.random()*innerWidth,y:-20-Math.random()*innerHeight*.3,vx:(Math.random()-.5)*3,vy:2+Math.random()*3,g:.05,life:1,decay:.0035+Math.random()*.003,w:6+Math.random()*6,h:3+Math.random()*5,rot:Math.random()*6,vr:(Math.random()-.5)*.3,c:confColors[Math.floor(Math.random()*confColors.length)]});
+  fxStart();
+ }
+ function fxFrame(t){
+  const dt=Math.min(2.5,(t-fxLast)/16.7||1);fxLast=t;
+  fctx.setTransform(fxDpr,0,0,fxDpr,0,0);fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+40);
+  for(const p of parts){
+   p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.985,dt);p.life-=p.decay*dt;if(p.rot!==undefined)p.rot+=p.vr*dt;
+   fctx.globalAlpha=Math.max(0,Math.min(1,p.life*(p.kind==='conf'?3:1)));fctx.fillStyle=p.c;
+   if(p.kind==='spark'){fctx.globalCompositeOperation='lighter';fctx.beginPath();fctx.arc(p.x,p.y,p.r*Math.max(.3,p.life),0,6.283);fctx.fill();fctx.globalCompositeOperation='source-over'}
+   else{fctx.save();fctx.translate(p.x,p.y);fctx.rotate(p.rot);fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);fctx.restore()}
+  }
+  rings=rings.filter(r=>r.life>0);
+  for(const r of rings){r.r+=(r.max-r.r)*.14*dt;r.life-=.035*dt;fctx.globalAlpha=Math.max(0,r.life);fctx.strokeStyle='rgba('+r.c+','+Math.max(0,r.life)+')';fctx.lineWidth=1+4*Math.max(0,r.life);fctx.beginPath();fctx.arc(r.x,r.y,r.r,0,6.283);fctx.stroke()}
+  flashes=flashes.filter(f=>f.life>0);
+  fctx.textAlign='center';fctx.textBaseline='middle';
+  for(const f of flashes){f.life-=.045*dt;fctx.globalAlpha=Math.max(0,f.life);fctx.font=Math.round(f.s*(1+(1-f.life)*1.4))+'px serif';fctx.fillText(f.e,f.x,f.y)}
+  fctx.globalAlpha=1;
+  if(parts.length||rings.length||flashes.length)requestAnimationFrame(fxFrame);else{fxRunning=false;fctx.clearRect(0,0,innerWidth,innerHeight)}
+ }
+ function sqCenter(sq){const el=boardEl.querySelector('[aria-label^="'+sq+'"]');if(!el)return null;const r=el.getBoundingClientRect();return r.width?{x:r.left+r.width/2,y:r.top+r.height/2,w:r.width}:null}
+ function kingSquare(color){const b=game.board();for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=b[r][c];if(p&&p.type==='k'&&p.color===color)return files[c]+(8-r)}return null}
+ function shake(big){const cls=big?'shake-big':'shake';boardEl.classList.remove('shake','shake-big');void boardEl.offsetWidth;boardEl.classList.add(cls);setTimeout(()=>boardEl.classList.remove(cls),big?750:450)}
+ function boomSound(big){
+  if(fxMode!=='boomsound')return;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
+   const dur=big?1.1:.4,len=Math.floor(actx.sampleRate*dur),buf=actx.createBuffer(1,len,actx.sampleRate),d=buf.getChannelData(0);
+   for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,big?2.2:3);
+   const src=actx.createBufferSource();src.buffer=buf;const f=actx.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(big?900:1400,actx.currentTime);f.frequency.exponentialRampToValueAtTime(80,actx.currentTime+dur);
+   const g=actx.createGain();g.gain.value=big?.7:.4;src.connect(f);f.connect(g);g.connect(actx.destination);src.start();
+  }catch(e){}
+ }
+ function playFx(move){
+  if(fxMode==='off'||!move||!game)return;
+  try{
+   if(game.in_checkmate()){
+    const k=kingSquare(game.turn()),c=k&&sqCenter(k);
+    if(c){burstAt(c.x,c.y,2.6);setTimeout(()=>burstAt(c.x+c.w,c.y-c.w/2,1.6),160);setTimeout(()=>burstAt(c.x-c.w,c.y+c.w/2,1.6),320)}
+    shake(true);boomSound(true);if(!computerMode||game.turn()==='b')setTimeout(confetti,250);return;
+   }
+   if(move.captured){const pw={p:1,n:1.2,b:1.2,r:1.5,q:2}[move.captured]||1,c=sqCenter(move.to);if(c)burstAt(c.x,c.y,pw);boomSound(pw>=1.5);if(pw>=1.5)shake(false)}
+   else if(move.promotion){const c=sqCenter(move.to);if(c)burstAt(c.x,c.y,.9,'✨')}
+   if(game.in_check()){const k=kingSquare(game.turn()),c=k&&sqCenter(k);if(c){rings.push({x:c.x,y:c.y,r:6,max:c.w*1.4,life:1,c:'255,80,70'});fxStart()}}
+  }catch(e){}
+ }
+ const fxSelect=$('fxMode');if(fxSelect){fxSelect.value=fxMode;fxSelect.onchange=()=>{fxMode=fxSelect.value;try{localStorage.setItem(fxKey,fxMode)}catch(e){}if(fxMode==='off'){note('Fun effects off.')}else{const b=boardEl.getBoundingClientRect();burstAt(b.left+b.width/2,b.top+b.height/2,1.6);boomSound(false);note(fxMode==='boomsound'?'Explosions with sound on.':'Explosions on!')}}}
  if(!game){$('statusTitle').textContent='Could not load chess rules';$('statusText').textContent='Check your internet connection and reload.'}
  render();
 })();
