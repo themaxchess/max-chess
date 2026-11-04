@@ -696,9 +696,11 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
   onlinePoll=setInterval(async()=>{
    if(!onlineGameId)return;loadGameChat();
    const q=await authClient.from('games').select('*').eq('id',onlineGameId).maybeSingle();
-   if(q.data&&q.data.fen!==game.fen()&&q.data.updated_at){
+   if(q.data&&q.data.updated_at){
     const currentFen=game.fen();
-    if(q.data.fen!==currentFen){game.load(q.data.fen);selected=null;legal=[];render();if(q.data.status!=='active'){$('onlineStatus').textContent='Game finished: '+q.data.status.replace('_',' ');clearInterval(onlinePoll);onlinePoll=null;await paintProfile();await renderCommunity()}}}
+    if(q.data.fen!==currentFen){game.load(q.data.fen);selected=null;legal=[];render()}
+    if(q.data.status!=='active'){$('onlineStatus').textContent='Game finished: '+q.data.status.replace('_',' ');clearInterval(onlinePoll);onlinePoll=null;await paintProfile();await renderCommunity()}
+   }
   },1500);
  }
  async function checkForOnlineGame(){
