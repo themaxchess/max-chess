@@ -824,7 +824,8 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
  function playFx(move){
   if(fxMode==='off'||!move||!game)return;
   try{
-   if(fxMode==='all'){confetti();fireworks();starBurst()}\n   if(fxMode==='confetti'){confetti();return}
+   if(fxMode==='all'){confetti();fireworks();starBurst()}
+   if(fxMode==='confetti'){confetti();return}
    if(fxMode==='fireworks'){fireworks();return}
    if(fxMode==='stars'){starBurst();return}
    if(game.in_checkmate()){
