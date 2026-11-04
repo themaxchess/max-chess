@@ -351,7 +351,7 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
     <h3 style="font-size:14px;margin:15px 0 8px">Move list</h3><div class="moves" id="moves"><span class="muted">Moves will appear here.</span></div>
     <div class="selectrow"><label for="pieceStyle">Piece style</label><select id="pieceStyle"><option value="friendly" selected>Friendly colors</option><option value="classic">Classic symbols</option><option value="bold">Bold solid</option></select></div>
     <div class="selectrow"><label for="boardTheme">Board theme</label><select id="boardTheme"><option value="royal" selected>Royal</option><option value="sunset">Sunset</option><option value="brown">Brown</option><option value="green">Green</option><option value="blue">Blue</option><option value="mono">Black & white</option></select></div>
-    <div class="selectrow"><label for="fxMode">Fun effects</label><select id="fxMode"><option value="boom">Explosions</option><option value="boomsound">Explosions + sound</option><option value="fireworks">Fireworks</option><option value="confetti">Confetti rain</option><option value="stars">Star burst</option><option value="off">Off</option></select></div>
+    <div class="selectrow"><label for="fxMode">Fun effects</label><select id="fxMode"><option value="boom">Explosions</option><option value="boomsound">Explosions + sound</option><option value="fireworks">Fireworks</option><option value="confetti">Confetti rain</option><option value="stars">Star burst</option><option value="all">ALL effects together</option><option value="off">Off</option></select></div>
     <div class="toast" id="toast" role="status"></div>
    </div>
    <div class="tabcontent hidden" id="learnTab"><h2>Learn as you play</h2><p class="desc">Short lessons to help you improve.</p>
@@ -774,7 +774,7 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
  function kingSquare(color){const b=game.board();for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=b[r][c];if(p&&p.type==='k'&&p.color===color)return files[c]+(8-r)}return null}
  function shake(big){const cls=big?'shake-big':'shake';boardEl.classList.remove('shake','shake-big');void boardEl.offsetWidth;boardEl.classList.add(cls);setTimeout(()=>boardEl.classList.remove(cls),big?750:450)}
  function boomSound(big){
-  if(fxMode!=='boomsound')return;
+  if(fxMode!=='boomsound'&&fxMode!=='all')return;
   try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
    const dur=big?1.1:.4,len=Math.floor(actx.sampleRate*dur),buf=actx.createBuffer(1,len,actx.sampleRate),d=buf.getChannelData(0);
    for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,big?2.2:3);
@@ -798,7 +798,7 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
    if(game.in_check()){const k=kingSquare(game.turn()),c=k&&sqCenter(k);if(c){rings.push({x:c.x,y:c.y,r:6,max:c.w*1.4,life:1,c:'255,80,70'});fxStart()}}
   }catch(e){}
  }
- const fxSelect=$('fxMode');if(fxSelect){fxSelect.value=fxMode;fxSelect.onchange=()=>{fxMode=fxSelect.value;try{localStorage.setItem(fxKey,fxMode)}catch(e){}if(fxMode==='off'){note('Fun effects off.')}else if(fxMode==='confetti'){confetti();note('Confetti rain on!')}else if(fxMode==='fireworks'){fireworks();note('Fireworks on!')}else if(fxMode==='stars'){starBurst();note('Star bursts on!')}else{const b=boardEl.getBoundingClientRect();burstAt(b.left+b.width/2,b.top+b.height/2,1.6);boomSound(false);note(fxMode==='boomsound'?'Explosions with sound on.':'Explosions on!')}}}
+ const fxSelect=$('fxMode');if(fxSelect){fxSelect.value=fxMode;fxSelect.onchange=()=>{fxMode=fxSelect.value;try{localStorage.setItem(fxKey,fxMode)}catch(e){}if(fxMode==='off'){note('Fun effects off.')}else if(fxMode==='confetti'){confetti();note('Confetti rain on!')}else if(fxMode==='fireworks'){fireworks();note('Fireworks on!')}else if(fxMode==='stars'){starBurst();note('Star bursts on!')}else if(fxMode==='all'){confetti();fireworks();starBurst();boomSound(false);note('ALL effects together!')}else{const b=boardEl.getBoundingClientRect();burstAt(b.left+b.width/2,b.top+b.height/2,1.6);boomSound(false);note(fxMode==='boomsound'?'Explosions with sound on.':'Explosions on!')}}}
  if(!game){$('statusTitle').textContent='Could not load chess rules';$('statusText').textContent='Check your internet connection and reload.'}
  render();
 })();
