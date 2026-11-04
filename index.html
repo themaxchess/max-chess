@@ -785,6 +785,9 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
  function playFx(move){
   if(fxMode==='off'||!move||!game)return;
   try{
+   if(fxMode==='confetti'){confetti();return}
+   if(fxMode==='fireworks'){fireworks();return}
+   if(fxMode==='stars'){starBurst();return}
    if(game.in_checkmate()){
     const k=kingSquare(game.turn()),c=k&&sqCenter(k);
     if(c){burstAt(c.x,c.y,2.6);setTimeout(()=>burstAt(c.x+c.w,c.y-c.w/2,1.6),160);setTimeout(()=>burstAt(c.x-c.w,c.y+c.w/2,1.6),320)}
