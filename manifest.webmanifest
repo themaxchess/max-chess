@@ -1,0 +1,15 @@
+{
+  "id": "/",
+  "name": "MaxChess – Free Online Chess",
+  "short_name": "MaxChess",
+  "description": "Play free chess, solve puzzles, learn openings and train every day.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#161512",
+  "theme_color": "#15122f",
+  "orientation": "any",
+  "icons": [
+    {"src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}
