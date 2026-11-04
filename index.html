@@ -752,7 +752,7 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
 
  /* ---------- fun effects: explosions, confetti, shake ---------- */
  const fxKey='maxchess_fx';
- let fxMode=(()=>{try{const v=localStorage.getItem(fxKey);if(['boom','boomsound','fireworks','confetti','stars','off'].includes(v))return v}catch(e){}return(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)?'off':'boom'})();
+ let fxMode=(()=>{try{const v=localStorage.getItem(fxKey);if(['boom','boomsound','fireworks','confetti','stars','all','off'].includes(v))return v}catch(e){}return(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)?'off':'boom'})();
  const fxCanvas=document.createElement('canvas');fxCanvas.id='fxCanvas';fxCanvas.setAttribute('aria-hidden','true');document.body.appendChild(fxCanvas);
  const fctx=fxCanvas.getContext('2d');let parts=[],rings=[],flashes=[],fxRunning=false,fxLast=0,fxDpr=1,actx=null;
  const fireColors=['#ffdf5d','#ffb02e','#ff7a1a','#ff4b1f','#fff3b0'],confColors=['#ff4d6d','#ffd23f','#3bceac','#4cc9f0','#b388ff','#ff9f1c'];
@@ -812,7 +812,7 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
  function playFx(move){
   if(fxMode==='off'||!move||!game)return;
   try{
-   if(fxMode==='confetti'){confetti();return}
+   if(fxMode==='all'){confetti();fireworks();starBurst()}\n   if(fxMode==='confetti'){confetti();return}
    if(fxMode==='fireworks'){fireworks();return}
    if(fxMode==='stars'){starBurst();return}
    if(game.in_checkmate()){
