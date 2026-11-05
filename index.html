@@ -247,6 +247,8 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
 .clock.active-clock{background:linear-gradient(135deg,#ffcf5c,#ff9f1c);color:#2b1500}
 .sq.last{box-shadow:inset 0 0 0 100px rgba(255,183,3,.38)}
 .sq.selected{box-shadow:inset 0 0 0 100px rgba(100,70,220,.45)}
+.sq.incheck{background-image:radial-gradient(circle,rgba(255,0,0,.95) 0%,rgba(231,0,0,.75) 28%,rgba(169,0,0,0) 72%)}
+.promo-choices{display:flex;gap:10px;justify-content:center;margin:14px 0}.promo-btn{font-size:46px;line-height:1;width:72px;height:72px;border-radius:10px;border:1px solid #555;background:#2b2a27;color:#fff;cursor:pointer}.promo-btn:hover,.promo-btn:focus{background:#3c3a37;outline:2px solid #8bc34a}
 .sq.legal:after{background:rgba(70,40,160,.55)}
 .sq.legal.capture:after{border-color:rgba(70,40,160,.55);background:transparent}
 .account-card{border:1px solid var(--line)}
@@ -437,6 +439,8 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
  </div>
 </div>
 
+<div hidden aria-hidden="true"><button type="button" id="puzzleReset"></button><button type="button" id="puzzleHint"></button><button type="button" id="puzzleSolution"></button></div>
+<div class="account-modal" id="promoModal" role="dialog" aria-modal="true" aria-labelledby="promoTitle"><div class="account-card" style="text-align:center"><h2 id="promoTitle">Promote your pawn</h2><div class="promo-choices" id="promoChoices"></div><button type="button" class="widebtn" id="promoCancel">Cancel</button></div></div>
 <div class="account-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
  <div class="account-card">
   <h2 id="profileTitle">Your account</h2>
@@ -481,7 +485,7 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
  function sqname(r,c){return files[c]+(8-r)}
  function render(){
   if(!game)return;boardEl.innerHTML='';let rows=[0,1,2,3,4,5,6,7],cols=[0,1,2,3,4,5,6,7];if(flipped){rows.reverse();cols.reverse()}
-  rows.forEach((r,ri)=>cols.forEach((c,ci)=>{let sq=sqname(r,c),p=game.get(sq),b=document.createElement('button');b.className='sq '+((r+c)%2===0?'light':'dark');b.setAttribute('role','gridcell');b.setAttribute('aria-label',sq+(p?', '+(p.color==='w'?'white ':'black ')+p.type:' empty'));if(selected===sq)b.classList.add('selected');if(legal.some(m=>m.to===sq)){b.classList.add('legal');if(p)b.classList.add('capture')}if(lastMove&&(lastMove.from===sq||lastMove.to===sq))b.classList.add('last');
+  rows.forEach((r,ri)=>cols.forEach((c,ci)=>{let sq=sqname(r,c),p=game.get(sq),b=document.createElement('button');b.className='sq '+((r+c)%2===0?'light':'dark');b.setAttribute('role','gridcell');b.setAttribute('aria-label',sq+(p?', '+(p.color==='w'?'white ':'black ')+p.type:' empty'));if(selected===sq)b.classList.add('selected');if(legal.some(m=>m.to===sq)){b.classList.add('legal');if(p)b.classList.add('capture')}if(lastMove&&(lastMove.from===sq||lastMove.to===sq))b.classList.add('last');if(p&&p.type==='k'&&p.color===game.turn()&&game.in_check())b.classList.add('incheck');
    if(ci===0){let co=document.createElement('span');co.className='coord';co.textContent=sq[1];b.appendChild(co)}if(ri===7){let co=document.createElement('span');co.className='coord';co.style.left='auto';co.style.right='3px';co.style.top='auto';co.style.bottom='1px';co.textContent=sq[0];b.appendChild(co)}
    if(p){let sp=document.createElement('span');sp.className='piece';const solid=style==='bold'||style==='friendly';sp.textContent=glyph[(solid?'b':p.color)+p.type];sp.style.color=style==='friendly'?(p.color==='w'?'#ffd23f':'#2ec4b6'):(p.color==='w'?'#fffef4':'#22231e');sp.style.textShadow=(p.color==='w'||style==='friendly')?'0 1px 2px #222,1px 0 #222,-1px 0 #222,0 -1px #222':'0 1px 1px #ffffff77';if(style==='bold'){sp.style.webkitTextStroke='1.5px #161512';sp.style.fontWeight='900'}b.appendChild(sp)}b.addEventListener('click',()=>tap(sq));boardEl.appendChild(b)
   }));
@@ -497,10 +501,15 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
   $('opponentSub').textContent=onlineGameId?$('opponentSub').textContent:computerMode?'MaxChess computer · '+computerLevel+' rated':'Local two-player game';
   finalizeRating();
  }
+ let promoChoice=null;
+ function askPromotion(sq){const m=$('promoModal'),w=game.turn()==='w',g={q:w?'♕':'♛',r:w?'♖':'♜',b:w?'♗':'♝',n:w?'♘':'♞'},box=$('promoChoices');box.innerHTML='';
+  ['q','r','b','n'].forEach(t=>{const bt=document.createElement('button');bt.type='button';bt.className='promo-btn';bt.textContent=g[t];bt.setAttribute('aria-label','Promote to '+{q:'queen',r:'rook',b:'bishop',n:'knight'}[t]);bt.onclick=()=>{m.classList.remove('open');promoChoice=t;tap(sq)};box.appendChild(bt)});
+  $('promoCancel').onclick=()=>m.classList.remove('open');m.classList.add('open')}
  function tap(sq){
   if(!game||game.game_over()||thinking)return;if(flaggedSide){note('Time is up. Start a new game to play again.');return}if(onlineGameId&&game.turn()!==onlineColor){note('Wait for your opponent to move.');return}
   if(selected&&legal.some(m=>m.to===sq)){
-   const previousFen=game.fen();let move=game.move({from:selected,to:sq,promotion:'q'});if(move){clockStarted=true;lastMove={from:move.from,to:move.to};selected=null;legal=[];render();playFx(move);if(puzzleMode){const played=move.from+move.to+(move.promotion||'');if(played===puzzleSolution[puzzleIndex]){puzzleIndex++;if(puzzleIndex<puzzleSolution.length){const replyUci=puzzleSolution[puzzleIndex],reply=game.move({from:replyUci.slice(0,2),to:replyUci.slice(2,4),promotion:replyUci[4]||'q'});if(reply){lastMove={from:reply.from,to:reply.to};puzzleIndex++;render()}}if(puzzleIndex>=puzzleSolution.length){puzzleMode=false;if(rushActive)rushPuzzleSolved();let pr=Number(localStorage.getItem('maxchess_puzzle_rating')||800)+12;localStorage.setItem('maxchess_puzzle_rating',String(pr));saveProgressCloud();$('puzzleRating').textContent=pr;paintHomeStats();$('puzzleFeedback').textContent='Correct! Puzzle solved. +12 puzzle points.';$('puzzlePlayStatus').textContent='🎉 Solved! Ready for another? Tap Next puzzle.';note('Puzzle solved! Brilliant play.')}else{$('puzzleFeedback').textContent='Good move! Keep going.';note('Correct move. Find the next one.')}}else{if(rushActive)rushPuzzleMissed();game.load(puzzleFen);puzzleIndex=0;selected=null;legal=[];lastMove=null;render();$('puzzleFeedback').textContent='Not quite. The position has been reset—try again.';$('puzzlePlayStatus').textContent='Try a different move. Check for forcing moves.';note('Not the puzzle solution. Try again.')}}if(onlineGameId)saveOnlinePosition(move,previousFen);if(computerMode&&game.turn()==='b'&&!game.game_over())setTimeout(computerMove,350);return}
+   if(!promoChoice&&legal.some(m=>m.to===sq&&m.promotion)){askPromotion(sq);return}
+   const previousFen=game.fen();let move=game.move({from:selected,to:sq,promotion:promoChoice||'q'});promoChoice=null;if(move){clockStarted=true;lastMove={from:move.from,to:move.to};selected=null;legal=[];render();playFx(move);if(puzzleMode){const played=move.from+move.to+(move.promotion||'');if(played===puzzleSolution[puzzleIndex]){puzzleIndex++;if(puzzleIndex<puzzleSolution.length){const replyUci=puzzleSolution[puzzleIndex],reply=game.move({from:replyUci.slice(0,2),to:replyUci.slice(2,4),promotion:replyUci[4]||'q'});if(reply){lastMove={from:reply.from,to:reply.to};puzzleIndex++;render()}}if(puzzleIndex>=puzzleSolution.length){puzzleMode=false;if(rushActive)rushPuzzleSolved();let pr=Number(localStorage.getItem('maxchess_puzzle_rating')||800)+12;localStorage.setItem('maxchess_puzzle_rating',String(pr));saveProgressCloud();$('puzzleRating').textContent=pr;paintHomeStats();$('puzzleFeedback').textContent='Correct! Puzzle solved. +12 puzzle points.';$('puzzlePlayStatus').textContent='🎉 Solved! Ready for another? Tap Next puzzle.';note('Puzzle solved! Brilliant play.')}else{$('puzzleFeedback').textContent='Good move! Keep going.';note('Correct move. Find the next one.')}}else{if(rushActive)rushPuzzleMissed();game.load(puzzleFen);puzzleIndex=0;selected=null;legal=[];lastMove=null;render();$('puzzleFeedback').textContent='Not quite. The position has been reset—try again.';$('puzzlePlayStatus').textContent='Try a different move. Check for forcing moves.';note('Not the puzzle solution. Try again.')}}if(onlineGameId)saveOnlinePosition(move,previousFen);if(computerMode&&game.turn()==='b'&&!game.game_over())setTimeout(computerMove,350);return}
   }
   let p=game.get(sq);if(p&&p.color===game.turn()){selected=sq;legal=game.moves({square:sq,verbose:true});render()}else{selected=null;legal=[];render()}
  }
