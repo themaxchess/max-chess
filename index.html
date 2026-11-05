@@ -290,6 +290,45 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
 /* MaxChess training center */
 .training-wrap{max-width:980px;margin:0 auto}.training-hero{padding:22px;border-radius:16px;background:linear-gradient(120deg,#173b35,#1d3654 65%,#38284f);border:1px solid #426b72}.training-hero h2{margin:0;color:#fff;font-size:26px}.training-hero p{color:#d5e5e5;margin:6px 0 0}.training-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}.training-stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}.training-stat strong{display:block;font-size:25px;color:var(--strong)}.training-stat span{font-size:12px;color:var(--muted)}.training-progress{height:12px;background:var(--panel3);border-radius:99px;overflow:hidden;margin:10px 0}.training-progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#6ac28a,#f4c95d);transition:width .2s}.training-task{display:flex;align-items:center;gap:12px;padding:13px;border-bottom:1px solid var(--line)}.training-task:last-child{border-bottom:0}.training-task input{width:20px;height:20px;accent-color:#7dbb57}.training-task b{display:block;color:var(--strong)}.training-task small{color:var(--muted)}.training-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.training-actions button{padding:10px 14px;border-radius:9px;font-weight:800}.training-faq details{padding:12px 0;border-bottom:1px solid var(--line)}.training-faq summary{cursor:pointer;font-weight:800;color:var(--strong)}@media(max-width:600px){.training-stats{grid-template-columns:1fr}.training-hero{padding:16px}}
 @media(max-width:600px){.growth-panel[aria-label="MaxChess questions"]{padding:16px!important}.growth-panel[aria-label="MaxChess questions"] .growth-grid{grid-template-columns:1fr!important}.growth-panel[aria-label="MaxChess questions"] .growth-actions button{flex:1 1 100%}}
+
+/* Phone-first play layout and touch controls */
+@media(max-width:760px){
+  html{ -webkit-text-size-adjust:100%; }
+  body{overflow-x:hidden}
+  .wrap,.main,.container{max-width:100%;width:100%;padding-left:10px;padding-right:10px}
+  .playgrid{display:flex;flex-direction:column;gap:12px;width:100%;align-items:stretch}
+  .boardcol{width:100%;min-width:0}
+  .board{width:min(100%,calc(100vw - 24px));max-width:640px;margin-inline:auto;touch-action:pan-y; -webkit-user-select:none}
+  .playerbar{min-height:48px;padding:7px 10px}
+  .clock{font-size:19px;padding:5px 9px}
+  .boardtools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px 0}
+  .boardtools .toolbtn,.boardtools select.toolbtn{width:100%;max-width:none;min-width:0;min-height:44px;padding:10px 7px;font-size:13px;white-space:normal}
+  .boardfoot{font-size:11px;gap:5px;flex-wrap:wrap}
+  .sidegame{width:100%;min-width:0}
+  .sidegame .tab{min-height:46px}
+  .sidegame .tabcontent{padding:14px}
+  .sidegame button,.puzzle-play-actions button{min-height:44px}
+  .playgrid .greenbtn,.playgrid .widebtn{min-height:46px}
+  .puzzle-play-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .puzzle-play-actions .greenbtn{grid-column:1/-1;margin:0}
+  .sq{font-size:clamp(30px,9vw,48px)}
+  .promo-btn{width:min(19vw,68px);height:min(19vw,68px);font-size:clamp(34px,10vw,46px)}
+  input,select,textarea{font-size:16px}
+  .welcome{gap:8px;flex-wrap:wrap}
+}
+@media(max-width:380px){
+  .boardtools{grid-template-columns:1fr 1fr}
+  .boardtools .toolbtn,.boardtools select.toolbtn{font-size:12px;padding:9px 5px}
+  .playername{font-size:13px}
+  .playersub{font-size:11px}
+  .clock{font-size:17px}
+  .boardfoot span:nth-child(2){display:none}
+}
+@media(min-width:761px) and (max-width:1050px){
+  .playgrid{grid-template-columns:minmax(0,1fr) minmax(230px,300px);gap:12px}
+  .boardtools .toolbtn{min-height:40px}
+}
+button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
 </style>
 </head>
 <body>
