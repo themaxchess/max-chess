@@ -14,35 +14,6 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"MaxChess","url":"https://themaxchessss.github.io/","description":"MaxChess is a free online chess site: play a friend or the computer, solve chess puzzles, learn the basics and analyze positions. No ads, no subscription."},{"@type":"WebApplication","name":"MaxChess","url":"https://themaxchessss.github.io/","applicationCategory":"GameApplication","operatingSystem":"Any","description":"MaxChess is a free online chess site: play a friend or the computer, solve chess puzzles, learn the basics and analyze positions. No ads, no subscription.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is MaxChess free?","acceptedAnswer":{"@type":"Answer","text":"Yes. Play on this website without a subscription. Some online features require a free account."}},{"@type":"Question","name":"Can I play MaxChess without signing up?","acceptedAnswer":{"@type":"Answer","text":"Yes. Start a game on this device or play the computer without creating an account."}},{"@type":"Question","name":"What can I practise on MaxChess?","acceptedAnswer":{"@type":"Answer","text":"Try chess puzzles, beginner lessons, openings, analysis and daily training goals."}}]}]}
-  // MaxChess School: class join codes and student-controlled public account sharing.
-  async function schoolLoad(){
-   const mine=$('schoolMyClasses'),dash=$('schoolTeacherDashboard');
-   if(!authClient||!authUser){mine.textContent='Sign in to view your classes.';dash.textContent='Sign in to manage a class.';return}
-   const q=await authClient.rpc('maxchess_school_my_classes');
-   if(q.error){mine.textContent='Could not load classes: '+q.error.message;return}
-   mine.innerHTML='';
-   if(!q.data?.length)mine.textContent='No classes yet. Create one or join with your teacher’s code.';
-   (q.data||[]).forEach(c=>{
-    const card=document.createElement('div');card.style.cssText='padding:10px;border:1px solid var(--line);border-radius:9px;margin:8px 0';
-    const title=document.createElement('b');title.textContent=c.class_name+(c.teacher?' · Teacher':' · Student');card.append(title);
-    if(c.join_code){const code=document.createElement('p');code.textContent='Class code: '+c.join_code;card.append(code);const copy=document.createElement('button');copy.className='toolbtn';copy.textContent='Copy class code';copy.onclick=()=>navigator.clipboard?.writeText(c.join_code).then(()=>note('Class code copied.'),()=>note('Copy unavailable.'));card.append(copy)}
-    if(c.teacher){const b=document.createElement('button');b.className='toolbtn';b.textContent='View student roster';b.onclick=()=>schoolRoster(c.class_id);card.append(b)}
-    mine.append(card);
-   });
-   if(!(q.data||[]).some(c=>c.teacher))dash.textContent='Create a class to see its student roster.';
-  }
-  async function schoolRoster(classId){
-   const out=$('schoolTeacherDashboard');out.textContent='Loading student progress…';
-   const q=await authClient.rpc('maxchess_school_roster',{p_class:classId});
-   if(q.error){out.textContent='Could not load roster: '+q.error.message;return}
-   if(!q.data?.length){out.textContent='No students have joined this class yet.';return}
-   const table=document.createElement('div');
-   q.data.forEach(st=>{const row=document.createElement('div');row.style.cssText='padding:10px 0;border-bottom:1px solid var(--line)';const name=document.createElement('b');name.textContent=st.username+' · '+st.rating+' MaxChess rating';row.append(name);const links=document.createElement('p');links.className='muted';const parts=[];if(st.lichess_username)parts.push('Lichess: '+st.lichess_username);if(st.chesscom_username)parts.push('Chess.com: '+st.chesscom_username);links.textContent=parts.length?parts.join(' · '):'No external accounts shared';row.append(links);const joined=document.createElement('small');joined.textContent='Joined '+new Date(st.joined_at).toLocaleDateString();row.append(joined);table.append(row)});out.replaceChildren(table);
-  }
-  $('schoolCreateClass').onclick=async()=>{if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}const out=$('schoolCreateStatus');out.textContent='Creating class…';const q=await authClient.rpc('maxchess_school_create_class',{p_name:$('schoolClassName').value});out.textContent=q.error?'Could not create class: '+q.error.message:'Class created! Share this code with students: '+q.data.join_code;await schoolLoad()};
-  $('schoolJoinClass').onclick=async()=>{if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}const out=$('schoolJoinStatus');out.textContent='Joining class…';const q=await authClient.rpc('maxchess_school_join',{p_code:$('schoolJoinCode').value});out.textContent=q.error?'Could not join: '+q.error.message:'You joined '+q.data.class_name+'!';await schoolLoad()};
-  $('schoolSaveAccounts').onclick=async()=>{if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}const out=$('schoolAccountStatus');if(!$('schoolShareAccounts').checked){out.textContent='Please check the sharing permission box before saving.';return}out.textContent='Saving…';const rows=[];for(const [provider,id] of [['lichess','schoolLichess'],['chesscom','schoolChesscom']]){const username=$(id).value.trim();if(username)rows.push({student_id:authUser.id,provider,username,share_with_teacher:true,updated_at:new Date().toISOString()})}if(!rows.length){out.textContent='Enter at least one username.';return}const q=await authClient.from('school_external_accounts').upsert(rows,{onConflict:'student_id,provider'});out.textContent=q.error?'Could not save: '+q.error.message:'Account usernames saved. Your class teachers can see them.'};
-  const schoolNav=document.querySelector('[data-page="schools"]');if(schoolNav)schoolNav.addEventListener('click',schoolLoad);
 </script>
 <style>
 :root{--bg:#161512;--panel:#262421;--panel2:#302e2c;--panel3:#1f1e1c;--line:#3c3a37;--text:#bababa;--strong:#e8e8e8;--muted:#8d8b88;--green:#629924;--green2:#85b23d;--blue:#3692e7;--boardlight:#f0d9b5;--boarddark:#b58863;--gold:#e8c765}
@@ -1112,6 +1083,35 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  if(!game){$('statusTitle').textContent='Could not load chess rules';$('statusText').textContent='Check your internet connection and reload.'}
  render();
 })();
+  // MaxChess School: class join codes and student-controlled public account sharing.
+  async function schoolLoad(){
+   const mine=$('schoolMyClasses'),dash=$('schoolTeacherDashboard');
+   if(!authClient||!authUser){mine.textContent='Sign in to view your classes.';dash.textContent='Sign in to manage a class.';return}
+   const q=await authClient.rpc('maxchess_school_my_classes');
+   if(q.error){mine.textContent='Could not load classes: '+q.error.message;return}
+   mine.innerHTML='';
+   if(!q.data?.length)mine.textContent='No classes yet. Create one or join with your teacher’s code.';
+   (q.data||[]).forEach(c=>{
+    const card=document.createElement('div');card.style.cssText='padding:10px;border:1px solid var(--line);border-radius:9px;margin:8px 0';
+    const title=document.createElement('b');title.textContent=c.class_name+(c.teacher?' · Teacher':' · Student');card.append(title);
+    if(c.join_code){const code=document.createElement('p');code.textContent='Class code: '+c.join_code;card.append(code);const copy=document.createElement('button');copy.className='toolbtn';copy.textContent='Copy class code';copy.onclick=()=>navigator.clipboard?.writeText(c.join_code).then(()=>note('Class code copied.'),()=>note('Copy unavailable.'));card.append(copy)}
+    if(c.teacher){const b=document.createElement('button');b.className='toolbtn';b.textContent='View student roster';b.onclick=()=>schoolRoster(c.class_id);card.append(b)}
+    mine.append(card);
+   });
+   if(!(q.data||[]).some(c=>c.teacher))dash.textContent='Create a class to see its student roster.';
+  }
+  async function schoolRoster(classId){
+   const out=$('schoolTeacherDashboard');out.textContent='Loading student progress…';
+   const q=await authClient.rpc('maxchess_school_roster',{p_class:classId});
+   if(q.error){out.textContent='Could not load roster: '+q.error.message;return}
+   if(!q.data?.length){out.textContent='No students have joined this class yet.';return}
+   const table=document.createElement('div');
+   q.data.forEach(st=>{const row=document.createElement('div');row.style.cssText='padding:10px 0;border-bottom:1px solid var(--line)';const name=document.createElement('b');name.textContent=st.username+' · '+st.rating+' MaxChess rating';row.append(name);const links=document.createElement('p');links.className='muted';const parts=[];if(st.lichess_username)parts.push('Lichess: '+st.lichess_username);if(st.chesscom_username)parts.push('Chess.com: '+st.chesscom_username);links.textContent=parts.length?parts.join(' · '):'No external accounts shared';row.append(links);const joined=document.createElement('small');joined.textContent='Joined '+new Date(st.joined_at).toLocaleDateString();row.append(joined);table.append(row)});out.replaceChildren(table);
+  }
+  $('schoolCreateClass').onclick=async()=>{if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}const out=$('schoolCreateStatus');out.textContent='Creating class…';const q=await authClient.rpc('maxchess_school_create_class',{p_name:$('schoolClassName').value});out.textContent=q.error?'Could not create class: '+q.error.message:'Class created! Share this code with students: '+q.data.join_code;await schoolLoad()};
+  $('schoolJoinClass').onclick=async()=>{if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}const out=$('schoolJoinStatus');out.textContent='Joining class…';const q=await authClient.rpc('maxchess_school_join',{p_code:$('schoolJoinCode').value});out.textContent=q.error?'Could not join: '+q.error.message:'You joined '+q.data.class_name+'!';await schoolLoad()};
+  $('schoolSaveAccounts').onclick=async()=>{if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}const out=$('schoolAccountStatus');if(!$('schoolShareAccounts').checked){out.textContent='Please check the sharing permission box before saving.';return}out.textContent='Saving…';const rows=[];for(const [provider,id] of [['lichess','schoolLichess'],['chesscom','schoolChesscom']]){const username=$(id).value.trim();if(username)rows.push({student_id:authUser.id,provider,username,share_with_teacher:true,updated_at:new Date().toISOString()})}if(!rows.length){out.textContent='Enter at least one username.';return}const q=await authClient.from('school_external_accounts').upsert(rows,{onConflict:'student_id,provider'});out.textContent=q.error?'Could not save: '+q.error.message:'Account usernames saved. Your class teachers can see them.'};
+  const schoolNav=document.querySelector('[data-page="schools"]');if(schoolNav)schoolNav.addEventListener('click',schoolLoad);
 </script>
 
 <footer style="margin:32px auto 18px;padding:18px 14px;max-width:1100px;text-align:center;color:#aeb8c8;font-size:13px;border-top:1px solid rgba(160,180,210,.2)">
