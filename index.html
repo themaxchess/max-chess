@@ -301,7 +301,8 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
   .wrap,.main,.container{max-width:100%;width:100%;padding-left:10px;padding-right:10px}
   .playgrid{display:flex;flex-direction:column;gap:12px;width:100%;align-items:stretch}
   .boardcol{width:100%;min-width:0}
-  .board{width:min(100%,calc(100vw - 24px));max-width:640px;margin-inline:auto;touch-action:pan-y; -webkit-user-select:none}
+  .board{width:min(100%,calc(100vw - 24px));max-width:640px;margin-inline:auto;touch-action:manipulation;-webkit-user-select:none;user-select:none;overscroll-behavior:contain}
+  .board .sq{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   .playerbar{min-height:48px;padding:7px 10px}
   .clock{font-size:19px;padding:5px 9px}
   .boardtools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px 0}
@@ -314,7 +315,7 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
   .playgrid .greenbtn,.playgrid .widebtn{min-height:46px}
   .puzzle-play-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .puzzle-play-actions .greenbtn{grid-column:1/-1;margin:0}
-  .sq{font-size:clamp(30px,9vw,48px)}
+  .sq{font-size:clamp(30px,9vw,48px);min-width:0;min-height:0}
   .promo-btn{width:min(19vw,68px);height:min(19vw,68px);font-size:clamp(34px,10vw,46px)}
   input,select,textarea{font-size:16px}
   .welcome{gap:8px;flex-wrap:wrap}
@@ -719,7 +720,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  
  const accountModal=$('accountModal'),accountForm=$('accountForm'),accountUsername=$('accountUsername'),accountPassword=$('accountPassword'),accountEmail=$('accountEmail');
  const authStatus=$('authStatus'),supabaseUrl=$('supabaseUrl'),supabaseKey=$('supabaseKey');
- const wasRecovery=/[#&]type=recovery/.test(location.hash||'');let authClient=null,authMode='signup',authUser=null,onlineGameId=null,onlineColor=null,onlinePoll=null,onlineBusy=false;
+ const wasRecovery=/[#&]type=recovery/.test(location.hash||'');let authClient=null,authMode='signup',authUser=null,onlineGameId=null,onlineColor=null,onlinePoll=null,onlineBusy=false,matchCheckBusy=false;
  function savedAuthConfig(){try{return JSON.parse(localStorage.getItem('maxchess_auth_config')||'null')}catch(e){return null}}
  function setAuthStatus(msg){if(authStatus)authStatus.textContent=msg}
  function saveCred(id,pw,name){try{if(window.PasswordCredential&&navigator.credentials&&navigator.credentials.store)navigator.credentials.store(new PasswordCredential({id:id,password:pw,name:name||id}))}catch(e){}}
@@ -927,9 +928,14 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   },1500);
  }
  async function checkForOnlineGame(){
-  if(!authClient||!authUser||!onlineBusy)return;
-  const q=await authClient.from('games').select('*').or('white_player.eq.'+authUser.id+',black_player.eq.'+authUser.id).eq('status','active').order('created_at',{ascending:false}).limit(1);
-  if(q.data?.length){await loadOnlineGame(q.data[0]);onlineBusy=false}
+  if(!authClient||!authUser||!onlineBusy||matchCheckBusy)return;
+  matchCheckBusy=true;
+  try{
+   const q=await authClient.from('games').select('*').or('white_player.eq.'+authUser.id+',black_player.eq.'+authUser.id).eq('status','active').order('created_at',{ascending:false}).limit(1);
+   if(q.error){$('onlineStatus').textContent='Still searching. Connection check: '+q.error.message;return}
+   if(q.data?.length){onlineBusy=false;if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}await loadOnlineGame(q.data[0])}
+  }catch(e){$('onlineStatus').textContent='Match search paused by a connection issue. Tap Find an online game to retry.';onlineBusy=false;if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}}
+  finally{matchCheckBusy=false}
  }
  async function startOnlineSearch(){
   if(!authClient||!authUser){note('Sign in or create a MaxChess account first.');openAccount('login');return}
@@ -937,13 +943,15 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}
   onlineBusy=true;onlineGameId=null;onlineColor=null;
   const secs=tcSecs();
-  const tc=secs===0?'0+0':secs===60?'1+0':secs===180?'3+0':secs===300?'5+0':secs===900?'15+0':'10+0';
+  const increment=getInc();const tc=secs===0?'0+0':secs===60?'1+0':secs===180?'3+0':secs===300?'5+0':secs===900?(increment===10?'15+10':'15+0'):'10+0';
   $('onlineStatus').textContent='Searching for an opponent… Keep this page open.';
-  const result=await authClient.rpc('find_maxchess_match',{p_time_control:tc});
-  if(result.error){onlineBusy=false;$('onlineStatus').textContent='Matchmaking error: '+result.error.message;return}
-  if(result.data?.status==='matched'){await checkForOnlineGame();return}
-  $('onlineStatus').textContent='You are in the queue. Waiting for another player…';
-  onlinePoll=setInterval(checkForOnlineGame,2000);
+  try{
+   const result=await authClient.rpc('find_maxchess_match',{p_time_control:tc});
+   if(result.error){onlineBusy=false;$('onlineStatus').textContent='Matchmaking error: '+result.error.message;return}
+   if(result.data?.status==='matched'){await checkForOnlineGame();return}
+   $('onlineStatus').textContent='You are in the queue. Waiting for another player…';
+   onlinePoll=setInterval(checkForOnlineGame,2000);
+  }catch(e){onlineBusy=false;$('onlineStatus').textContent='Could not contact matchmaking. Check your connection and try again.';if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}}
  }
  $('findOnline').onclick=startOnlineSearch;
  $('cancelOnline').onclick=async()=>{
