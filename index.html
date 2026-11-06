@@ -1144,8 +1144,12 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   // MaxChess School: class join codes and student-controlled public account sharing.
   async function schoolLoad(){
    const mine=$('schoolMyClasses'),dash=$('schoolTeacherDashboard');
-   if(!authClient||!authUser){mine.textContent='Sign in to view your classes.';dash.textContent='Sign in to manage a class.';return}
+   if(!authClient){mine.textContent='Account service is unavailable. Refresh and try again.';dash.textContent='Account service is unavailable.';return}
    try{
+    const sessionResult=await authClient.auth.getSession();
+    if(sessionResult.error)throw sessionResult.error;
+    authUser=sessionResult.data?.session?.user||null;
+    if(!authUser){mine.textContent='Sign in to view your classes.';dash.textContent='Sign in to manage a class.';return}
     const q=await authClient.rpc('maxchess_school_my_classes');
     if(q.error)throw q.error;
     const classes=Array.isArray(q.data)?q.data:[];
@@ -1199,15 +1203,20 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    q.data.forEach(st=>{const row=document.createElement('div');row.style.cssText='padding:10px 0;border-bottom:1px solid var(--line)';const name=document.createElement('b');name.textContent=st.username+' · '+st.rating+' MaxChess rating';row.append(name);const gameCount=document.createElement('small');gameCount.textContent='MaxChess games completed: '+Number(st.maxchess_games_played||0);row.append(gameCount);const links=document.createElement('div');links.className='muted';if(st.lichess_username){const a=document.createElement('a');a.href='https://lichess.org/@/'+encodeURIComponent(st.lichess_username);a.target='_blank';a.rel='noopener noreferrer';a.textContent='Lichess profile: '+st.lichess_username+' (public profile found)';links.append(a);const stat=document.createElement('p');stat.textContent='Loading Lichess ratings…';links.append(stat);schoolPublicStats('lichess',st.lichess_username).then(x=>stat.textContent='Lichess public ratings: '+x)}if(st.chesscom_username){const a=document.createElement('a');a.href='https://www.chess.com/member/'+encodeURIComponent(st.chesscom_username);a.target='_blank';a.rel='noopener noreferrer';a.textContent='Chess.com: '+st.chesscom_username+' (username not verified)';links.append(a);const stat=document.createElement('p');stat.textContent='Loading Chess.com ratings…';links.append(stat);schoolPublicStats('chesscom',st.chesscom_username).then(x=>stat.textContent='Chess.com public ratings: '+x)}if(!st.lichess_username&&!st.chesscom_username)links.textContent='No external accounts shared';row.append(links);const joined=document.createElement('small');joined.textContent='Joined '+new Date(st.joined_at).toLocaleDateString();row.append(joined);table.append(row)});out.replaceChildren(table);
   }
   $('schoolCreateClass').onclick=async()=>{
-   if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}
    const out=$('schoolCreateStatus'),btn=$('schoolCreateClass'),className=$('schoolClassName').value.trim();
+   if(!authClient){out.textContent='Account service is unavailable. Refresh MaxChess and try again.';return}
    if(className.length<2||className.length>60){out.textContent='Enter a class name between 2 and 60 characters.';return}
-   btn.disabled=true;out.textContent='Creating class…';
+   btn.disabled=true;out.textContent='Checking your sign-in…';
    try{
+    const sessionResult=await authClient.auth.getSession();
+    if(sessionResult.error)throw sessionResult.error;
+    authUser=sessionResult.data?.session?.user||null;
+    if(!authUser){out.textContent='You need to sign in before creating a class.';openAccount('login');return}
+    out.textContent='Creating class…';
     const q=await authClient.rpc('maxchess_school_create_class',{p_name:className});
     if(q.error)throw q.error;
     const created=Array.isArray(q.data)?q.data[0]:q.data;
-    if(!created||!created.join_code)throw new Error('The class request returned no join code. Refresh My classes to check whether it was created.');
+    if(!created||!created.join_code)throw new Error('The class was created but MaxChess did not return its join code. Open My classes and refresh.');
     out.textContent='Class created! Share this code with students: '+created.join_code;
     $('schoolClassName').value='';
     await schoolLoad();
