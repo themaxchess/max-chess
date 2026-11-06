@@ -541,6 +541,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    <label for="accountUsername">Username</label><input id="accountUsername" name="username" maxlength="30" minlength="3" autocomplete="nickname" placeholder="The Max of Chess" required>
    <label for="accountPassword">Password</label><input id="accountPassword" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" required>
    <div class="account-actions"><button class="greenbtn" type="submit" style="margin:0">Register</button><button class="account-close" type="button" id="closeAccount">Cancel</button></div>
+   <button type="button" class="widebtn" id="lichessLoginBtn" style="width:100%;margin-top:10px;border:1px solid var(--line)">♞ Sign in with Lichess</button>
    <p style="margin:12px 0 0"><button type="button" class="mini-link" id="switchAccountMode">Already have an account? Sign in</button></p>
    <p style="margin:4px 0 0"><button type="button" class="mini-link" id="forgotPw" style="display:none">Forgot password?</button></p>
   </form>
@@ -971,9 +972,59 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   $('onlineStatus').textContent='Search cancelled.';note('Online search cancelled.');
  };
  function openAccount(mode){setAuthMode(mode||'signup');accountUsername.value='';accountEmail.value='';accountPassword.value='';accountModal.classList.add('open');(mode==='reset'?accountPassword:mode==='login'?accountEmail:accountUsername).focus()}
+
+ const LICHESS_OAUTH_CLIENT_ID='https://themaxchessss.github.io';
+ const LICHESS_OAUTH_REDIRECT='https://themaxchessss.github.io/';
+ function oauthBase64Url(bytes){let binary='';for(const b of bytes)binary+=String.fromCharCode(b);return btoa(binary).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'')}
+ function oauthRandom(size=48){const bytes=crypto.getRandomValues(new Uint8Array(size));return oauthBase64Url(bytes)}
+ async function startLichessLogin(){
+  const btn=$('lichessLoginBtn');if(btn)btn.disabled=true;
+  try{
+   if(!window.crypto?.subtle)throw new Error('Secure sign-in is not supported by this browser. Update Safari and try again.');
+   const verifier=oauthRandom(64),state=oauthRandom(32);
+   const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier));
+   const challenge=oauthBase64Url(new Uint8Array(digest));
+   sessionStorage.setItem('maxchess_lichess_oauth',JSON.stringify({verifier,state,redirectUri:LICHESS_OAUTH_REDIRECT}));
+   const url=new URL('https://lichess.org/oauth');
+   url.searchParams.set('response_type','code');
+   url.searchParams.set('client_id',LICHESS_OAUTH_CLIENT_ID);
+   url.searchParams.set('redirect_uri',LICHESS_OAUTH_REDIRECT);
+   url.searchParams.set('code_challenge_method','S256');
+   url.searchParams.set('code_challenge',challenge);
+   url.searchParams.set('state',state);
+   window.location.assign(url.toString());
+  }catch(err){if(btn)btn.disabled=false;setAuthStatus(err?.message||'Could not start Lichess sign-in. Please try again.')}
+ }
+ async function finishLichessLogin(){
+  const params=new URLSearchParams(location.search),code=params.get('code'),returnedState=params.get('state'),oauthError=params.get('error');
+  if(!code&&!oauthError)return;
+  history.replaceState(null,'',location.pathname+location.hash);
+  accountModal.classList.add('open');setAuthMode('login');
+  if(oauthError){setAuthStatus(oauthError==='access_denied'?'You cancelled Lichess authorization. You can try again.':'Lichess authorization did not finish. Please try again.');return}
+  let saved=null;try{saved=JSON.parse(sessionStorage.getItem('maxchess_lichess_oauth')||'null');sessionStorage.removeItem('maxchess_lichess_oauth')}catch(_){}
+  if(!code||!saved?.verifier||!returnedState||returnedState!==saved.state||saved.redirectUri!==LICHESS_OAUTH_REDIRECT){
+   setAuthStatus('The Lichess sign-in expired or its security check did not match. Please tap Sign in with Lichess again.');return;
+  }
+  if(!authClient){setAuthStatus('MaxChess account service is still connecting. Refresh this page and try again.');return}
+  const btn=$('lichessLoginBtn');if(btn)btn.disabled=true;
+  setAuthStatus('Lichess approved your sign-in. Finishing your MaxChess login…');
+  try{
+   const {data,error}=await authClient.functions.invoke('maxchess-lichess-auth',{body:{code,code_verifier:saved.verifier,redirect_uri:saved.redirectUri}});
+   if(error||data?.error)throw new Error(data?.error||error?.message||'Could not verify your Lichess account.');
+   if(!data?.token_hash)throw new Error('MaxChess did not receive a secure sign-in confirmation. Please try again.');
+   const {data:sessionData,error:sessionError}=await authClient.auth.verifyOtp({token_hash:data.token_hash,type:'magiclink'});
+   if(sessionError)throw sessionError;
+   authUser=sessionData.user||sessionData.session?.user||null;
+   if(!authUser)throw new Error('MaxChess did not create a signed-in session. Please try again.');
+   accountModal.classList.remove('open');paintProfile();
+   note('Welcome to MaxChess, '+(data.lichess_username||'Lichess player')+'!');
+  }catch(err){setAuthStatus(err?.message||'Lichess sign-in failed. Please try again.')}
+  finally{if(btn)btn.disabled=false}
+ }
  const profileModal=$('profileModal');
  function openProfile(){$('profileInfo').textContent='Signed in as '+(authUser.user_metadata?.username||'player')+(authUser.email?' ('+authUser.email+')':'')+'.';$('closeConfirm').value='';$('closeStatus').textContent='';profileModal.querySelector('details').open=false;profileModal.classList.add('open')}
  $('loginBtn').onclick=()=>{if(authUser){openProfile();return}openAccount('login')};
+ $('lichessLoginBtn').onclick=startLichessLogin;
  $('closeProfile').onclick=()=>profileModal.classList.remove('open');
  profileModal.addEventListener('click',e=>{if(e.target===profileModal)profileModal.classList.remove('open')});
  $('closeAccountBtn').onclick=async()=>{
@@ -997,7 +1048,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  accountModal.addEventListener('click',e=>{if(e.target===accountModal)accountModal.classList.remove('open')});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'){accountModal.classList.remove('open');profileModal.classList.remove('open')}});
  accountForm.onsubmit=async e=>{e.preventDefault();if(authMode==='reset'){const pw=accountPassword.value;if(!authClient||!authUser){setAuthStatus('This reset link has expired. Request a new one with Forgot password.');return}if(pw.length<8){setAuthStatus('Use a password with at least 8 characters.');return}const {error}=await authClient.auth.updateUser({password:pw});if(error){setAuthStatus(error.message);return}accountPassword.value='';accountModal.classList.remove('open');try{history.replaceState(null,'',location.pathname)}catch(_){}paintProfile();note('Password updated. You are signed in.');return}if(!authClient){setAuthStatus('Connect your Supabase project below before signing up or logging in.');accountPassword.value='';return}const email=accountEmail.value.trim(),password=accountPassword.value,username=accountUsername.value.trim();if(password.length<8){setAuthStatus('Use a password with at least 8 characters.');return}try{if(authMode==='login'){const {data,error}=await authClient.auth.signInWithPassword({email,password});if(error)throw error;authUser=data.user;saveCred(email,password,authUser?.user_metadata?.username);accountModal.classList.remove('open');paintProfile();note('Welcome back to MaxChess!')}else{if(username.length<3||username.length>30){setAuthStatus('Username must be 3–30 characters.');return}const {data,error}=await authClient.auth.signUp({email,password,options:{data:{username},emailRedirectTo:'https://themaxchessss.github.io/'}});if(error)throw error;if(data.user&&Array.isArray(data.user.identities)&&data.user.identities.length===0){setAuthStatus('An account with this email already exists. Click “Already have an account? Sign in” below, or use Forgot password.');accountPassword.value='';return}authUser=data.session?.user||null;if(data.session){saveCred(email,password,username);accountModal.classList.remove('open');paintProfile();note('Welcome to MaxChess, '+username+'!')}else{setAuthStatus('Check your email to confirm your account, then log in.');accountPassword.value=''}}}catch(err){const msg=err.message||'Authentication failed.';if(authMode==='login'&&/invalid login credentials|invalid_credentials/i.test(msg)){setAuthStatus('That email or password is not right. Try again, or click Forgot password to reset it. If you have not registered yet, click Register.');}else if(authMode==='signup'&&/already registered|user already exists/i.test(msg)){setAuthStatus('An account with this email already exists. Click “Already have an account? Sign in” below.');}else{setAuthStatus(msg)}accountPassword.value=''}};
- const cfg=savedAuthConfig()||{url:'https://bvukakfhkebpsviehirr.supabase.co',key:'sb_publishable_YTyppUkZGBFHmaNOg2ZSMg_xiFJw2rG'};supabaseUrl.value=cfg.url||'';supabaseKey.value=cfg.key||'';connectAuth(cfg.url||'',cfg.key||'',true);
+ const cfg=savedAuthConfig()||{url:'https://bvukakfhkebpsviehirr.supabase.co',key:'sb_publishable_YTyppUkZGBFHmaNOg2ZSMg_xiFJw2rG'};supabaseUrl.value=cfg.url||'';supabaseKey.value=cfg.key||'';connectAuth(cfg.url||'',cfg.key||'',true).then(ok=>{if(ok)finishLichessLogin()});
  paintProfile();
  document.querySelectorAll('[data-learnpage]').forEach(()=>{});
  $('brandHome').onclick=()=>navigate('home');$('brandHome').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigate('home')}};
