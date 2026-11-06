@@ -609,7 +609,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
     }else pgn='[Result "'+resultTag+'"]\n'+pgn;
     const trimmed=pgn.trim(),lastBreak=trimmed.lastIndexOf(' '),lastToken=trimmed.slice(lastBreak+1);
     if(['*','1-0','0-1','1/2-1/2'].includes(lastToken))pgn=trimmed.slice(0,lastBreak+1)+resultTag;
-    else pgn=trimmed+'\\n'+resultTag;
+    else pgn=trimmed+'\n'+resultTag;
    }
    const clientGameId=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2));
    const response=await authClient.functions.invoke('maxchess-lichess-import-local',{body:{pgn,client_game_id:clientGameId}});
