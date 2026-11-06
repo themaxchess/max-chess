@@ -589,36 +589,27 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  function finalizeRating(){if(!game||!game.game_over()||!computerMode||ratingFinalized)return;ratingFinalized=true;let score=0.5,result='draw';if(game.in_checkmate()){if(game.turn()==='b'){score=1;result='win';computerRatingData.wins++}else{score=0;result='loss';computerRatingData.losses++}}else if(game.in_draw()){computerRatingData.draws++}else return;const expected=1/(1+Math.pow(10,(computerLevel-computerRatingData.rating)/400));const change=Math.round(32*(score-expected));computerRatingData.rating=Math.max(100,Math.min(4000,computerRatingData.rating+change));try{localStorage.setItem(computerRatingKey,JSON.stringify(computerRatingData))}catch(e){}paintRating();saveProgressCloud();note(result==='win'?'You won! Rating '+(change>=0?'+':'')+change+'.':result==='loss'?'Game lost. Rating '+change+'.':'Draw! Rating '+(change>=0?'+':'')+change+'.')}
  async function importLocalCompletedGame(){
   if(localLichessImportAttempted||!game||!game.game_over()||onlineGameId)return;
-  localLichessImportAttempted=true;
   try{
-   if(!authClient){note('Sign in with Lichess to send completed MaxChess games to your Lichess account.');return}
+   if(!authClient){note('Sign in with Lichess first, then start a new game to import it.');return}
    const sessionResult=await authClient.auth.getSession();
    if(sessionResult.error)throw sessionResult.error;
-   if(!sessionResult.data?.session?.access_token){note('Sign in with Lichess to automatically import this game.');return}
-   const resultTag=game.in_checkmate()?(game.turn()==='w'?'0-1':'1-0'):'1/2-1/2';
-   const date=new Date(),dateTag=date.getFullYear()+'.'+String(date.getMonth()+1).padStart(2,'0')+'.'+String(date.getDate()).padStart(2,'0');
-   let pgn=game.pgn({newline:'\\n'}).trim();
-   const finalToken=pgn.split(/\\s+/).pop();
-   if(['*','1-0','0-1','1/2-1/2'].includes(finalToken))pgn=pgn.slice(0,pgn.lastIndexOf(finalToken)).trim();
-   if(!pgn.includes('[Event "')){
-    const white=computerMode?'MaxChess Player':'Player 1',black=computerMode?'MaxChess Computer':'Player 2';
-    pgn='[Event "MaxChess"]\\n[Site "https://themaxchessss.github.io"]\\n[Date "'+dateTag+'"]\\n[White "'+white+'"]\\n[Black "'+black+'"]\\n[Result "'+resultTag+'"]\\n\\n'+pgn;
-   }else{
-    const resultStart=pgn.indexOf('[Result "');
-    if(resultStart>=0){
-     const resultEnd=pgn.indexOf(']',resultStart);
-     if(resultEnd>=0)pgn=pgn.slice(0,resultStart)+'[Result "'+resultTag+'"]'+pgn.slice(resultEnd+1);
-    }else pgn='[Result "'+resultTag+'"]\\n'+pgn;
-   }
-   pgn=pgn.trim()+'\\n'+resultTag;
+   if(!sessionResult.data?.session?.access_token){note('Your MaxChess session is not linked to Lichess. Use Sign in with Lichess, then play a new game.');return}
+   const resultTag=game.isCheckmate()?(game.turn()==='w'?'0-1':'1-0'):'1/2-1/2';
+   const now=new Date();
+   const dateTag=now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0');
+   const moves=game.pgn().replace(/\\s*(?:\\*|1-0|0-1|1\\/2-1\\/2)\\s*$/,'').trim();
+   const white=computerMode?'MaxChess Player':'Player 1';
+   const black=computerMode?'MaxChess Computer':'Player 2';
+   const pgn='[Event "MaxChess"]\\n[Site "https://themaxchessss.github.io"]\\n[Date "'+dateTag+'"]\\n[White "'+white+'"]\\n[Black "'+black+'"]\\n[Result "'+resultTag+'"]\\n\\n'+moves+'\\n'+resultTag;
    const clientGameId=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2));
+   localLichessImportAttempted=true;
    const response=await authClient.functions.invoke('maxchess-lichess-import-local',{body:{pgn,client_game_id:clientGameId}});
    if(response.error||response.data?.error)throw new Error(response.data?.error||response.error?.message||'Lichess import failed.');
-   if(response.data?.url)note('Your MaxChess game was imported to Lichess! Open: '+response.data.url);
-   else note('MaxChess sent the game to Lichess.');
+   if(response.data?.url)note('Imported to Lichess! Open your game: '+response.data.url);
+   else note('MaxChess sent your completed game to Lichess.');
   }catch(error){
    localLichessImportAttempted=false;
-   note('Lichess import did not work: '+(error?.message||'Please sign in with Lichess and try another game.'));
+   note('Lichess import failed: '+(error?.message||'Sign in with Lichess again and retry with a new game.'));
   }
  }
  const files='abcdefgh';
@@ -707,7 +698,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  (function(){const d=$('clockDelay');if(!d)return;try{let v=localStorage.getItem('maxchess_clock_delay');if(v&&/^\d+$/.test(v)&&v!=='0')v='d'+v;if(v!==null&&[...d.options].some(o=>o.value===v))d.value=v}catch(e){}d.onchange=()=>{try{localStorage.setItem('maxchess_clock_delay',d.value)}catch(e){}delayTurn=null;const n=Number(String(d.value).slice(1))||0;note(!n?'Clock delay and bonus turned off.':d.value[0]==='d'?'Clock waits '+n+' seconds before counting down each move.':'You gain '+n+' seconds after every move.')}})();
  $('timeControl').onchange=()=>{applyTcExtra();clockInitial=tcSecs();whiteSeconds=blackSeconds=clockInitial;clockStarted=false;clockPaused=false;flaggedSide=null;paintClocks();note('Time control changed. Start a new game to use it.')};
 
- function navigate(page){if(page==='achievements'&&typeof paintAchievements==='function')paintAchievements();if(page==='leagues'&&typeof paintLeague==='function')paintLeague();document.querySelectorAll('.pageview').forEach(v=>v.classList.remove('active'));let p=$('page-'+page);if(p)p.classList.add('active');document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='puzzles')$('puzzleRating').textContent=localStorage.getItem('maxchess_puzzle_rating')||'800';if(page==='profile')loadPlayerProfile();if(page==='community')renderCommunity();if(page==='community-comments')loadCommunityComments();if(page==='friends')loadFriends();if(page==='tournaments')loadTournaments();if(page==='play')window.scrollTo({top:0,behavior:'smooth'});if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
+ function navigate(page){if(page==='achievements'&&typeof paintAchievements==='function')paintAchievements();if(page==='leagues'&&typeof paintLeague==='function')paintLeague();document.querySelectorAll('.pageview').forEach(v=>v.classList.remove('active'));let p=$('page-'+page);if(p)p.classList.add('active');document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='puzzles')$('puzzleRating').textContent=localStorage.getItem('maxchess_puzzle_rating')||'800';if(page==='profile')loadPlayerProfile();if(page==='community')renderCommunity();if(page==='community-comments')loadCommunityComments();if(page==='friends')loadFriends();if(page==='tournaments')loadTournaments();if(page==='schools')schoolLoad();if(page==='play')window.scrollTo({top:0,behavior:'smooth'});if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
  // Keyboard navigation shortcuts. Shortcuts are disabled while typing in a form field.
  document.addEventListener('keydown',event=>{if(event.altKey||event.ctrlKey||event.metaKey)return;const target=event.target;if(target&&target.closest&&target.closest('input,textarea,select,[contenteditable="true"]'))return;const key=event.key.toLowerCase();const pages={h:'home',1:'play',2:'puzzles',3:'training',4:'analysis',5:'community',l:'learn',c:'computer'};if(key==='?'){note('Keyboard shortcuts: H home · 1 play · 2 puzzles · 3 training · 4 analysis · 5 community · L learn · C computer.');return;}if(pages[key]){navigate(pages[key]);note('Opened '+pages[key]+'.');}});
  // Installable app support. The service worker caches the app shell and static libraries for offline loading.
