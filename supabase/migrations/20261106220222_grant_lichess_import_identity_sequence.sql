@@ -1,0 +1,1 @@
+GRANT USAGE, SELECT ON SEQUENCE public.lichess_game_imports_id_seq TO service_role;
