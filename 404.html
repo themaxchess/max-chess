@@ -4,95 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#161512">
-<title>MaxChess — 404 Chess Challenge</title>
+<title>Returning to MaxChess</title>
 <style>
-:root{color-scheme:dark;--bg:#161512;--panel:#22211d;--line:#444137;--gold:#e8c765;--text:#f2f0e8;--muted:#b7b2a5}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#343024 0,#161512 58%);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif;display:grid;place-items:center;padding:22px}
-.wrap{width:min(100%,850px);display:grid;grid-template-columns:minmax(250px,420px) minmax(240px,1fr);gap:26px;align-items:center}
-h1{font-size:clamp(30px,6vw,46px);margin:0 0 5px;color:var(--gold)}h2{font-size:21px;margin:0 0 8px}.muted{color:var(--muted);line-height:1.5}.board{width:100%;aspect-ratio:1;display:grid;grid-template-columns:repeat(8,1fr);border:5px solid #75694b;border-radius:8px;overflow:hidden;box-shadow:0 16px 48px #0008}
-.square{border:0;border-radius:0;padding:0;display:grid;place-items:center;position:relative;cursor:pointer;font-family:"Arial Unicode MS",serif;font-size:clamp(25px,6vw,47px);line-height:1;color:#171717;text-shadow:0 1px 1px #fff7}
-.light{background:#e9dfc7}.dark{background:#82916f}.square.sel{outline:4px solid var(--gold);outline-offset:-4px}.square.target:after{content:"";width:24%;height:24%;border-radius:50%;background:#25351f99;position:absolute}.square.capture:after{content:"";position:absolute;inset:3px;border:4px solid #25351f99;border-radius:50%}
-.side{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:22px;box-shadow:0 12px 36px #0005}.status{min-height:48px;padding:12px;border-radius:9px;background:#151410;border:1px solid var(--line);margin:16px 0;line-height:1.4}
-button.action{background:var(--gold);color:#211d12;border:0;border-radius:8px;padding:11px 16px;font-weight:750;font-size:15px;cursor:pointer;margin:4px 5px 4px 0}button.secondary{background:#3a382f;color:var(--text);border:1px solid #5b5546}button:disabled{opacity:.5;cursor:wait}
-a{color:var(--gold)}.back{display:inline-block;margin-top:14px}.hint{font-size:13px;color:var(--muted);margin-top:12px}
-@media(max-width:680px){.wrap{grid-template-columns:1fr;max-width:440px;gap:15px}.side{padding:17px}.board{max-width:440px;margin:auto}}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#161512;color:#f2f0e8;font:16px system-ui,sans-serif;text-align:center;padding:24px;box-sizing:border-box}
+main{max-width:440px}h1{color:#e8c765}a{color:#e8c765}
 </style>
 </head>
 <body>
-<main class="wrap">
-<section>
-<h1>404 — Wrong turn!</h1>
-<p class="muted">That page is missing, but your next chess move isn't. Play MaxChess against the computer while you find your way back.</p>
-<div id="board" class="board" role="group" aria-label="Chess board"></div>
-</section>
-<aside class="side">
-<h2>♟ MaxChess Mini Game</h2>
-<p class="muted">You play White. The computer plays Black at <b>Medium</b> difficulty.</p>
-<div id="status" class="status" aria-live="polite">Your move — make a move with the white pieces.</div>
-<button id="newGame" class="action">New game</button>
-<button id="undo" class="action secondary">Undo move</button>
-<p class="hint">Tap a piece, then tap its destination square. The computer searches ahead three half-moves. Pawns promote to queens automatically.</p>
-<a class="back" href="/">← Back to MaxChess home</a>
-</aside>
+<main>
+<h1>Returning to MaxChess…</h1>
+<p>Your sign-in or game link is being sent back to the MaxChess website.</p>
+<p><a id="home" href="/">Tap here if you are not redirected.</a></p>
 </main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script>
 (function(){
- const board=document.getElementById('board'),status=document.getElementById('status'),undoBtn=document.getElementById('undo');
- if(typeof Chess!=='function'){status.textContent='The chess engine did not load. Check your connection and reload this page.';return}
- let game=new Chess(),selected=null,legal=[],thinking=false;
- const glyph={wk:'♔',wq:'♕',wr:'♖',wb:'♗',wn:'♘',wp:'♙',bk:'♚',bq:'♛',br:'♜',bb:'♝',bn:'♞',bp:'♟'};
- function say(){if(game.in_checkmate())status.textContent=game.turn()==='w'?'Checkmate — the computer wins. Try again!':'You win by checkmate!';else if(game.in_draw())status.textContent='Draw game. Good battle! Start another?';else if(thinking)status.textContent='Computer is thinking…';else status.textContent=game.in_check()?'Check! Your move.':'Your move — make a move with the white pieces.'}
- function render(){
-  board.replaceChildren();const position=game.board();
-  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
-   const sq=String.fromCharCode(97+c)+(8-r),piece=position[r][c],b=document.createElement('button');
-   b.type='button';b.className='square '+((r+c)%2?'dark':'light');if(selected===sq)b.classList.add('sel');
-   const move=legal.find(m=>m.to===sq);if(move)b.classList.add(move.captured?'capture':'target');
-   b.textContent=piece?glyph[piece.color+piece.type]:'';b.setAttribute('aria-label',sq+(piece?', '+piece.color+' '+piece.type:'') );b.disabled=thinking||game.game_over();
-   b.addEventListener('click',()=>tap(sq));board.append(b);
-  }
-  undoBtn.disabled=thinking||game.history().length<2;say();
- }
- function tap(sq){
-  if(thinking||game.game_over())return;
-  const piece=game.get(sq);
-  if(selected){
-   const chosen=legal.find(m=>m.to===sq);
-   if(chosen){game.move({from:selected,to:sq,promotion:'q'});selected=null;legal=[];render();if(!game.game_over())computerMove();return}
-  }
-  if(piece&&piece.color==='w'){selected=sq;legal=game.moves({square:sq,verbose:true});}
-  else{selected=null;legal=[]}
-  render();
- }
- const value={p:100,n:320,b:335,r:500,q:900,k:20000};
- function evaluate(){
-  if(game.in_checkmate())return -100000;
-  if(game.in_draw())return 0;
-  let score=0;const b=game.board();
-  for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=b[r][c];if(!p)continue;let v=value[p.type];const center=3.5-(Math.abs(3.5-r)+Math.abs(3.5-c))/2;v+=p.type==='n'||p.type==='b'?center*9:p.type==='p'?(p.color==='w'?(6-r):r-1)*5:0;score+=p.color==='w'?v:-v}
-  const side=game.turn();return side==='w'?score:-score;
- }
- function search(depth,alpha,beta){
-  if(depth===0||game.game_over())return evaluate();
-  let moves=game.moves({verbose:true});moves.sort((a,b)=>((b.captured?value[b.captured]:0)-(a.captured?value[a.captured]:0)));
-  let best=-Infinity;
-  for(const m of moves){game.move(m);const score=-search(depth-1,-beta,-alpha);game.undo();if(score>best)best=score;if(score>alpha)alpha=score;if(alpha>=beta)break}
-  return best===-Infinity?evaluate():best;
- }
- function computerMove(){
-  thinking=true;render();
-  setTimeout(()=>{
-   let moves=game.moves({verbose:true}),best=-Infinity,choices=[];
-   moves.sort((a,b)=>((b.captured?value[b.captured]:0)-(a.captured?value[a.captured]:0)));
-   for(const m of moves){game.move(m);const score=-search(2,-Infinity,Infinity);game.undo();if(score>best){best=score;choices=[m]}else if(score===best)choices.push(m)}
-   if(choices.length)game.move(choices[Math.floor(Math.random()*choices.length)]);
-   thinking=false;selected=null;legal=[];render();
-  },100);
- }
- document.getElementById('newGame').addEventListener('click',()=>{game.reset();selected=null;legal=[];thinking=false;render()});
- undoBtn.addEventListener('click',()=>{if(thinking)return;game.undo();game.undo();selected=null;legal=[];render()});
- render();
+ const target=new URL("/",location.origin);
+ target.search=location.search;
+ target.hash=location.hash;
+ document.getElementById("home").href=target.href;
+ if(location.pathname!=="/"&&location.pathname!=="/index.html")location.replace(target.href);
 })();
 </script>
 </body>
