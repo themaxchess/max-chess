@@ -30,6 +30,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
 .topbar{display:flex;align-items:center;gap:6px;height:56px;padding:0 clamp(12px,3vw,40px);background:var(--panel);border-bottom:1px solid #000;box-shadow:0 2px 8px #0006;position:sticky;top:0;z-index:20}
 .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:22px;color:var(--strong);cursor:pointer;margin-right:14px;letter-spacing:-.3px;user-select:none}
 .brandmark{font-size:30px;line-height:1;color:var(--strong)}
+.brandlogo{display:block;width:38px;height:38px;flex:0 0 38px;object-fit:contain;border-radius:10px;filter:drop-shadow(0 2px 5px #0006)}
 .topnav{display:flex;align-items:stretch;height:100%}
 .navgroup{position:relative;display:flex;align-items:stretch}
 .navtop{background:transparent;color:var(--text);padding:0 14px;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
@@ -334,7 +335,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
 <body>
 <div class="app">
 <header class="topbar">
- <div class="brand" id="brandHome" role="link" tabindex="0" aria-label="MaxChess home"><div class="brandmark">♞</div><span class="brandname">Max<b>Chess</b></span></div>
+ <div class="brand" id="brandHome" role="link" tabindex="0" aria-label="MaxChess home"><img class="brandlogo" src="./icon.svg" alt="MaxChess crown logo" width="38" height="38"><span class="brandname">Max<b>Chess</b></span></div>
  <nav class="topnav" aria-label="Main">
   <div class="navgroup"><button type="button" class="navtop">Play</button><div class="dropdown">
    <button class="navitem active" data-page="home">Home</button>
