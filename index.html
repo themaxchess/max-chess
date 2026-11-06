@@ -597,20 +597,20 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    if(!sessionResult.data?.session?.access_token){note('Sign in with Lichess to automatically import this game.');return}
    const resultTag=game.in_checkmate()?(game.turn()==='w'?'0-1':'1-0'):'1/2-1/2';
    const date=new Date(),dateTag=date.getFullYear()+'.'+String(date.getMonth()+1).padStart(2,'0')+'.'+String(date.getDate()).padStart(2,'0');
-   let pgn=game.pgn({newline:'\n'}).trim();
+   let pgn=game.pgn({newline:'\\n'}).trim();
+   const finalToken=pgn.split(/\\s+/).pop();
+   if(['*','1-0','0-1','1/2-1/2'].includes(finalToken))pgn=pgn.slice(0,pgn.lastIndexOf(finalToken)).trim();
    if(!pgn.includes('[Event "')){
     const white=computerMode?'MaxChess Player':'Player 1',black=computerMode?'MaxChess Computer':'Player 2';
-    pgn='[Event "MaxChess"]\n[Site "https://themaxchessss.github.io"]\n[Date "'+dateTag+'"]\n[White "'+white+'"]\n[Black "'+black+'"]\n[Result "'+resultTag+'"]\n\n'+pgn+'\n'+resultTag;
+    pgn='[Event "MaxChess"]\\n[Site "https://themaxchessss.github.io"]\\n[Date "'+dateTag+'"]\\n[White "'+white+'"]\\n[Black "'+black+'"]\\n[Result "'+resultTag+'"]\\n\\n'+pgn;
    }else{
     const resultStart=pgn.indexOf('[Result "');
     if(resultStart>=0){
      const resultEnd=pgn.indexOf(']',resultStart);
      if(resultEnd>=0)pgn=pgn.slice(0,resultStart)+'[Result "'+resultTag+'"]'+pgn.slice(resultEnd+1);
-    }else pgn='[Result "'+resultTag+'"]\n'+pgn;
-    const trimmed=pgn.trim(),lastBreak=trimmed.lastIndexOf(' '),lastToken=trimmed.slice(lastBreak+1);
-    if(['*','1-0','0-1','1/2-1/2'].includes(lastToken))pgn=trimmed.slice(0,lastBreak+1)+resultTag;
-    else pgn=trimmed+'\n'+resultTag;
+    }else pgn='[Result "'+resultTag+'"]\\n'+pgn;
    }
+   pgn=pgn.trim()+'\\n'+resultTag;
    const clientGameId=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2));
    const response=await authClient.functions.invoke('maxchess-lichess-import-local',{body:{pgn,client_game_id:clientGameId}});
    if(response.error||response.data?.error)throw new Error(response.data?.error||response.error?.message||'Lichess import failed.');
