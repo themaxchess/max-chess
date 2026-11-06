@@ -581,12 +581,46 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  const $=id=>document.getElementById(id), boardEl=$('board'), toast=$('toast'), toastbar=$('toastbar');
  const glyph={wp:'♙',wn:'♘',wb:'♗',wr:'♖',wq:'♕',wk:'♔',bp:'♟\uFE0E',bn:'♞',bb:'♝',br:'♜',bq:'♛',bk:'♚'};
  const emoji={wp:'♙',wn:'♘',wb:'♗',wr:'♖',wq:'♕',wk:'♔',bp:'♟',bn:'♞',bb:'♗',br:'♜',bq:'♛',bk:'♚'};
- const game=window.Chess?new Chess():null;let selected=null,legal=[],flipped=false,lastMove=null,style='friendly',computerMode=false,thinking=false,puzzleMode=false,clockInitial=600,whiteSeconds=600,blackSeconds=600,clockStarted=false,clockPaused=false,flaggedSide=null,ratingFinalized=false;
+ const game=window.Chess?new Chess():null;let selected=null,legal=[],flipped=false,lastMove=null,style='friendly',computerMode=false,thinking=false,puzzleMode=false,clockInitial=600,whiteSeconds=600,blackSeconds=600,clockStarted=false,clockPaused=false,flaggedSide=null,ratingFinalized=false,localLichessImportAttempted=false;
  const ratingKey='maxchess_rating_v1';let ratingData=(()=>{try{return JSON.parse(localStorage.getItem(ratingKey))||{rating:1200,wins:0,losses:0,draws:0}}catch(e){return {rating:1200,wins:0,losses:0,draws:0}}})();
  const computerRatingKey='maxchess_computer_rating_v2';let computerRatingData=(()=>{try{return JSON.parse(localStorage.getItem(computerRatingKey))||{rating:800,wins:0,losses:0,draws:0}}catch(e){return {rating:800,wins:0,losses:0,draws:0}}})();
  let computerLevel=800;
  function paintRating(){const n=$('ratingNumber'),r=$('ratingRecord');if(n)n.textContent=ratingData.rating;const h=$('homeRatingNumber');if(h)h.textContent=ratingData.rating;if(r)r.textContent=ratingData.wins+' wins · '+ratingData.losses+' losses · '+ratingData.draws+' draws';const cr=$('computerRatingDisplay');if(cr)cr.textContent=computerRatingData.rating;['computerWins','computerLosses','computerDraws'].forEach((id,i)=>{const el=$(id);if(el)el.textContent=[computerRatingData.wins,computerRatingData.losses,computerRatingData.draws][i]});paintHomeStats()}function paintHomeStats(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};put('hqPracticeRating',ratingData.rating);put('hqPuzzleRating',localStorage.getItem('maxchess_puzzle_rating')||800);put('hqWins',ratingData.wins);put('hqGames',ratingData.wins+ratingData.losses+ratingData.draws)}
  function finalizeRating(){if(!game||!game.game_over()||!computerMode||ratingFinalized)return;ratingFinalized=true;let score=0.5,result='draw';if(game.in_checkmate()){if(game.turn()==='b'){score=1;result='win';computerRatingData.wins++}else{score=0;result='loss';computerRatingData.losses++}}else if(game.in_draw()){computerRatingData.draws++}else return;const expected=1/(1+Math.pow(10,(computerLevel-computerRatingData.rating)/400));const change=Math.round(32*(score-expected));computerRatingData.rating=Math.max(100,Math.min(4000,computerRatingData.rating+change));try{localStorage.setItem(computerRatingKey,JSON.stringify(computerRatingData))}catch(e){}paintRating();saveProgressCloud();note(result==='win'?'You won! Rating '+(change>=0?'+':'')+change+'.':result==='loss'?'Game lost. Rating '+change+'.':'Draw! Rating '+(change>=0?'+':'')+change+'.')}
+ async function importLocalCompletedGame(){
+  if(localLichessImportAttempted||!game||!game.game_over()||onlineGameId)return;
+  localLichessImportAttempted=true;
+  try{
+   if(!authClient){note('Sign in with Lichess to send completed MaxChess games to your Lichess account.');return}
+   const sessionResult=await authClient.auth.getSession();
+   if(sessionResult.error)throw sessionResult.error;
+   if(!sessionResult.data?.session?.access_token){note('Sign in with Lichess to automatically import this game.');return}
+   const resultTag=game.in_checkmate()?(game.turn()==='w'?'0-1':'1-0'):'1/2-1/2';
+   const date=new Date(),dateTag=date.getFullYear()+'.'+String(date.getMonth()+1).padStart(2,'0')+'.'+String(date.getDate()).padStart(2,'0');
+   let pgn=game.pgn({newline:'\n'}).trim();
+   if(!pgn.includes('[Event "')){
+    const white=computerMode?'MaxChess Player':'Player 1',black=computerMode?'MaxChess Computer':'Player 2';
+    pgn='[Event "MaxChess"]\n[Site "https://themaxchessss.github.io"]\n[Date "'+dateTag+'"]\n[White "'+white+'"]\n[Black "'+black+'"]\n[Result "'+resultTag+'"]\n\n'+pgn+'\n'+resultTag;
+   }else{
+    const resultStart=pgn.indexOf('[Result "');
+    if(resultStart>=0){
+     const resultEnd=pgn.indexOf(']',resultStart);
+     if(resultEnd>=0)pgn=pgn.slice(0,resultStart)+'[Result "'+resultTag+'"]'+pgn.slice(resultEnd+1);
+    }else pgn='[Result "'+resultTag+'"]\n'+pgn;
+    const tokens=pgn.trim().split(/\s+/),last=tokens[tokens.length-1];
+    if(['*','1-0','0-1','1/2-1/2'].includes(last))tokens[tokens.length-1]=resultTag;else tokens.push(resultTag);
+    pgn=tokens.join(' ');
+   }
+   const clientGameId=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2));
+   const response=await authClient.functions.invoke('maxchess-lichess-import-local',{body:{pgn,client_game_id:clientGameId}});
+   if(response.error||response.data?.error)throw new Error(response.data?.error||response.error?.message||'Lichess import failed.');
+   if(response.data?.url)note('Your MaxChess game was imported to Lichess! Open: '+response.data.url);
+   else note('MaxChess sent the game to Lichess.');
+  }catch(error){
+   localLichessImportAttempted=false;
+   note('Lichess import did not work: '+(error?.message||'Please sign in with Lichess and try another game.'));
+  }
+ }
  const files='abcdefgh';
  const lessons={
  pieces:['The six chess pieces','The king moves one square in any direction. The queen moves any number of squares in straight lines or diagonals. A rook moves horizontally or vertically. A bishop moves diagonally. A knight jumps in an L-shape and can leap over pieces. A pawn moves forward but captures diagonally.','Each piece has a different job. The knight is the only piece that can jump over other pieces.','Imagine a knight on e4. It can jump to c3, c5, d2, d6, f2, f6, g3 or g5.','Which piece can jump over other pieces?',['Queen','Knight','Bishop'],1,'The knight jumps in an L-shape and can leap over pieces.'],
@@ -617,6 +651,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   const notationRows=[];for(let i=0;i<history.length;i+=2){const n=i/2+1,w=history[i],b=history[i+1]||'';notationRows.push('<div class="notation-row"><span class="notation-number">'+n+'.</span><span class="notation-move '+(i===history.length-1?'current':'')+'">'+w+'</span><span class="notation-move '+(i+1===history.length-1?'current':'')+(b?'':' empty')+'">'+(b||'…')+'</span></div>')}$('moves').innerHTML=notationRows.length?notationRows.join(''):'<div class="notation-empty">Your moves will appear here.</div>';
   $('opponentSub').textContent=onlineGameId?$('opponentSub').textContent:computerMode?'MaxChess computer · '+computerLevel+' rated':'Local two-player game';
   finalizeRating();
+  if(over&&!onlineGameId)importLocalCompletedGame();
  }
  const copyNotationButton=$('copyNotation');if(copyNotationButton)copyNotationButton.onclick=async()=>{try{const pgn=game.pgn({newline:'\n'});await navigator.clipboard.writeText(pgn||'[Event "MaxChess game"]\n\n*');note('Game notation copied as PGN.')}catch(e){note('Could not copy notation. Use Download PGN instead.')}};
  let promoChoice=null;
@@ -637,14 +672,12 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   if(!game||game.game_over()||game.turn()!=='b'||!computerMode)return;thinking=true;$('statusText').textContent='MaxChess is choosing a move…';
   const moves=game.moves({verbose:true});if(!moves.length){thinking=false;return}
   let chosen;
-  if(computerLevel<=400){chosen=moves[Math.floor(Math.random()*moves.length)]}
-  else if(computerLevel<=600){const checks=moves.filter(m=>m.san.includes('+')||m.san.includes('#')),captures=moves.filter(m=>m.captured);const pool=checks.length?checks:captures.length?captures:moves;chosen=pool[Math.floor(Math.random()*pool.length)]}
-  else{const depth=computerLevel>=1400?2:1;let candidates=moves.slice().sort((a,b)=>(b.captured?1:0)-(a.captured?1:0));if(candidates.length>18)candidates.length=18;let best=Infinity,choices=[];for(const m of candidates){const next=new Chess(game.fen());next.move({from:m.from,to:m.to,promotion:'q'});const score=searchScore(next,depth-1,-Infinity,Infinity,true);if(score<best){best=score;choices=[m]}else if(score===best)choices.push(m)}chosen=choices[Math.floor(Math.random()*choices.length)]}
+  {const depth=computerLevel>=1200?3:2;const priority=m=>(m.captured?10:0)+(m.promotion?8:0)+(m.san.includes('+')?4:0)+(m.san.includes('#')?100:0);let candidates=moves.slice().sort((a,b)=>priority(b)-priority(a));if(candidates.length>20)candidates.length=20;let best=Infinity,choices=[];for(const m of candidates){const next=new Chess(game.fen());next.move({from:m.from,to:m.to,promotion:m.promotion||'q'});const score=searchScore(next,depth-1,-Infinity,Infinity,true);if(score<best){best=score;choices=[m]}else if(score===best)choices.push(m)}chosen=choices[Math.floor(Math.random()*choices.length)]}
   if(chosen){const m=game.move({from:chosen.from,to:chosen.to,promotion:'q'});clockStarted=true;lastMove={from:m.from,to:m.to};selected=null;legal=[];thinking=false;render();playFx(m)}else thinking=false
  }
- function computerMove(){if(!game||game.game_over()||game.turn()!=='b'||!computerMode||thinking)return;thinking=true;stockfishPurpose='computer';stockfishFen=game.fen();const requestedFen=stockfishFen;$('statusText').textContent='MaxChess is thinking…';if(!createStockfishWorker()){computerMoveFallback();return}if(stockfishReady)launchStockfishComputerMove();setTimeout(()=>{if(game&&computerMode&&!game.game_over()&&game.turn()==='b'&&game.fen()===requestedFen&&thinking){try{if(stockfishWorker)stockfishWorker.postMessage('stop')}catch(e){}stockfishPurpose='analysis';computerMoveFallback();note('Computer engine took too long, so MaxChess used its backup move.')}},6000)}
+ function computerMove(){if(!game||game.game_over()||game.turn()!=='b'||!computerMode||thinking)return;thinking=true;stockfishPurpose='computer';stockfishFen=game.fen();const requestedFen=stockfishFen;$('statusText').textContent='MaxChess is thinking…';if(!createStockfishWorker()){computerMoveFallback();return}if(stockfishReady)launchStockfishComputerMove();setTimeout(()=>{if(game&&computerMode&&!game.game_over()&&game.turn()==='b'&&game.fen()===requestedFen&&thinking){try{if(stockfishWorker)stockfishWorker.postMessage('stop')}catch(e){}stockfishPurpose='analysis';computerMoveFallback();note('Computer engine took too long, so MaxChess used its backup move.')}},12000)}
 
- function reset(computer=false){if(!game)return;try{if(stockfishWorker)stockfishWorker.postMessage('stop')}catch(e){}thinking=false;stockfishPurpose='analysis';game.reset();ratingFinalized=false;puzzleMode=false;if(onlineGameId||onlinePoll){onlineGameId=null;onlineColor=null;onlineBusy=false;$('onlineGameActions').style.display='none';if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}$('opponentName').textContent='Black pieces';$('onlineStatus').textContent='Sign in, then find an opponent anywhere on MaxChess.';loadGameChat()}selected=null;legal=[];lastMove=null;computerMode=computer;applyTcExtra();clockInitial=tcSecs();whiteSeconds=blackSeconds=clockInitial;clockStarted=false;clockPaused=false;flaggedSide=null;render();note(computer?'Beginner computer game started.':'New game started.')}
+ function reset(computer=false){if(!game)return;try{if(stockfishWorker)stockfishWorker.postMessage('stop')}catch(e){}thinking=false;stockfishPurpose='analysis';game.reset();ratingFinalized=false;localLichessImportAttempted=false;puzzleMode=false;if(onlineGameId||onlinePoll){onlineGameId=null;onlineColor=null;onlineBusy=false;$('onlineGameActions').style.display='none';if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}$('opponentName').textContent='Black pieces';$('onlineStatus').textContent='Sign in, then find an opponent anywhere on MaxChess.';loadGameChat()}selected=null;legal=[];lastMove=null;computerMode=computer;applyTcExtra();clockInitial=tcSecs();whiteSeconds=blackSeconds=clockInitial;clockStarted=false;clockPaused=false;flaggedSide=null;render();note(computer?'Beginner computer game started.':'New game started.')}
  $('newGame').onclick=()=>reset(false);$('startGame').onclick=()=>reset(false);$('computerLevel').onchange=()=>{computerLevel=Number($('computerLevel').value)||800;note('Computer level set to '+computerLevel+'.')};$('undo').onclick=()=>{if(onlineGameId){note('Takeback is not available in online games.');return}if(game.undo()){if(computerMode&&game.turn()==='b')game.undo();selected=null;legal=[];lastMove=null;render();note('Last move taken back.')}else note('There are no moves to take back yet.')};$('flip').onclick=()=>{flipped=!flipped;render()};$('playComputer').onclick=()=>{reset(true);navigate('play')};$('computerStart').onclick=()=>{computerLevel=Number($('computerLevel').value)||800;reset(true);navigate('play');note('Rated computer game started · opponent '+computerLevel+'.')};$('analysisStart').onclick=()=>navigate('play');$('openingStart').onclick=()=>navigate('play');$('practiceStart').onclick=()=>navigate('play');$('puzzleStart').onclick=()=>navigate('play');
  $('hint').onclick=()=>{if(!game||game.game_over()){note('Start a game first.');return}let ms=game.moves({verbose:true});if(!ms.length)return;let checks=ms.filter(m=>m.san.includes('+')||m.san.includes('#')),caps=ms.filter(m=>m.captured),m=(checks[0]||caps[0]||ms[0]);selected=m.from;legal=game.moves({square:m.from,verbose:true});render();note('Hint: look at '+m.from+' and consider '+m.san+'.')};
 
@@ -887,8 +920,8 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  }
  function launchStockfishComputerMove(){
   if(!stockfishWorker||!stockfishReady||!game||!computerMode||game.game_over()||game.turn()!=='b'){thinking=false;return}
-  stockfishFen=game.fen();const skill=computerLevel<=400?0:computerLevel<=600?2:computerLevel<=800?4:computerLevel<=1000?7:computerLevel<=1400?12:20;
-  const time=computerLevel<=400?180:computerLevel<=600?300:computerLevel<=800?450:computerLevel<=1000?650:computerLevel<=1400?900:1300;
+  stockfishFen=game.fen();const skill=computerLevel<=400?3:computerLevel<=600?6:computerLevel<=800?9:computerLevel<=1000?12:computerLevel<=1400?16:20;
+  const time=computerLevel<=400?500:computerLevel<=600?700:computerLevel<=800?1000:computerLevel<=1000?1500:computerLevel<=1400?2200:3200;
   stockfishWorker.postMessage('setoption name Skill Level value '+skill);stockfishWorker.postMessage('position fen '+stockfishFen);stockfishWorker.postMessage('go movetime '+time);stockfishBusy=true;
  }
  function startStockfishReview(){
