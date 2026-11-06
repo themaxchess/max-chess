@@ -1074,8 +1074,43 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   <div style="margin-top:6px">Original MaxChess website content, design and code are protected by copyright where applicable. Third-party software and assets remain subject to their respective licences.</div>
 </footer>
 
-
+<script>
 /* MaxChess daily mission: local to this device, resets each calendar day. */
+(function(){
+  const card=document.getElementById('maxDailyChallenge');
+  if(!card)return;
+  const tasks=[
+    'Play one careful game and review one mistake.',
+    'Solve three tactics puzzles without guessing.',
+    'Practise developing both knights and bishops.',
+    'Play a 5-minute game and check your king safety.',
+    'Find one useful move for every piece before moving.',
+    'Review a game and spot your biggest missed opportunity.',
+    'Practise checkmate patterns for five minutes.'
+  ];
+  const now=new Date();
+  const day=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  let hash=0;
+  for(let i=0;i<day.length;i++)hash=(hash*31+day.charCodeAt(i))>>>0;
+  document.getElementById('maxDailyTask').textContent=tasks[hash%tasks.length];
+  const key='maxchess_daily_done_'+day;
+  const btn=document.getElementById('maxDailyDone');
+  const status=document.getElementById('maxDailyStatus');
+  function paint(done){
+    btn.disabled=done;
+    btn.textContent=done?'✓ Mission completed today':"Mark today's mission complete";
+    status.textContent=done?'Great work! Your progress is saved on this device.':'Your mission is ready. You can complete it any time today.';
+  }
+  let done=false;
+  try{done=localStorage.getItem(key)==='1';}catch(e){}
+  paint(done);
+  btn.addEventListener('click',function(){
+    if(btn.disabled)return;
+    try{localStorage.setItem(key,'1');}catch(e){}
+    paint(true);
+  });
+})();
+</script>
 (function(){const card=document.getElementById('maxDailyChallenge');if(!card)return;const tasks=['Play one careful game and review one mistake.','Solve three tactics puzzles without guessing.','Practise developing both knights and bishops.','Play a 5-minute game and check your king safety.','Find one useful move for every piece before moving.','Review a game and spot your biggest missed opportunity.','Practise checkmate patterns for five minutes.'];const now=new Date(),day=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');let hash=0;for(let i=0;i<day.length;i++)hash=(hash*31+day.charCodeAt(i))>>>0;document.getElementById('maxDailyTask').textContent=tasks[hash%tasks.length];const key='maxchess_daily_done_'+day,btn=document.getElementById('maxDailyDone'),status=document.getElementById('maxDailyStatus');function paint(){const done=localStorage.getItem(key)==='1';btn.disabled=done;btn.textContent=done?'✓ Mission completed today':'Mark today\'s mission complete';status.textContent=done?'Great work! Your progress is saved on this device.':'Your mission is ready. You can complete it any time today.'}btn.addEventListener('click',function(){localStorage.setItem(key,'1');paint()});try{paint()}catch(e){status.textContent='Daily mission ready. Progress saving is unavailable in this browser.';btn.addEventListener('click',()=>{status.textContent='Nice work completing your daily mission!'})}})();
 </body>
 </html>
