@@ -1,8 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MaxChess queen chess piece logo">
-<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".48" stop-color="#f5c85b"/><stop offset="1" stop-color="#c88925"/></linearGradient></defs>
-<rect width="512" height="512" rx="112" fill="#17152d"/><circle cx="256" cy="256" r="202" fill="#263b56" stroke="url(#gold)" stroke-width="17"/><circle cx="256" cy="256" r="181" fill="none" stroke="#f5c85b" stroke-opacity=".22" stroke-width="3"/>
-<path d="M151 184 171 119 219 158 256 91 293 158 341 119 361 184 345 220H167Z" fill="url(#gold)" stroke="#fff0b5" stroke-width="8" stroke-linejoin="round"/>
-<circle cx="151" cy="112" r="17" fill="#fff0b5" stroke="#c88925" stroke-width="5"/><circle cx="219" cy="145" r="15" fill="#fff0b5" stroke="#c88925" stroke-width="5"/><circle cx="256" cy="83" r="19" fill="#fff0b5" stroke="#c88925" stroke-width="5"/><circle cx="293" cy="145" r="15" fill="#fff0b5" stroke="#c88925" stroke-width="5"/><circle cx="361" cy="112" r="17" fill="#fff0b5" stroke="#c88925" stroke-width="5"/>
-<path d="M169 199H343L331 230H181Z" fill="#fff0b5" stroke="#c88925" stroke-width="6"/>
-<path d="M220 230H292L299 268C302 287 320 303 337 320L365 354H147L175 320C192 303 210 287 213 268Z" fill="#fff5dc" stroke="url(#gold)" stroke-width="11" stroke-linejoin="round"/>
-<path d="M179 324H333M163 357H349" fill="none" stroke="#d49a37" stroke-width="8" stroke-linecap="round"/><path d="M139 365H373V392H139Z" fill="url(#gold)" stroke="#fff0b5" stroke-width="5"/><path d="M158 397H354V416H158Z" fill="#f5c85b"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MaxChess golden queen">
+<defs>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8bf"/><stop offset=".22" stop-color="#ffdf55"/><stop offset=".48" stop-color="#f59b00"/><stop offset=".72" stop-color="#ffec78"/><stop offset="1" stop-color="#9b4b00"/></linearGradient>
+ <linearGradient id="body" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#a84d00"/><stop offset=".22" stop-color="#ffe66a"/><stop offset=".48" stop-color="#d77b00"/><stop offset=".76" stop-color="#fff0a0"/><stop offset="1" stop-color="#9a4600"/></linearGradient>
+ <radialGradient id="shine" cx=".35" cy=".2" r=".8"><stop stop-color="#fffbd1"/><stop offset=".35" stop-color="#ffc928"/><stop offset="1" stop-color="#a64c00"/></radialGradient>
+ <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="512" height="512" rx="88" fill="#080808"/>
+<g filter="url(#glow)" stroke="#ffcf38" stroke-width="5" stroke-linejoin="round">
+ <!-- Queen's flared crown -->
+ <path d="M126 135 Q111 104 132 91 Q154 81 166 111 L209 145 L256 49 L303 145 L346 111 Q359 81 380 91 Q401 104 386 135 L354 211 Q256 239 158 211Z" fill="url(#gold)"/>
+ <path d="M126 135 Q177 181 213 173 L256 99 L299 173 Q335 181 386 135" fill="none" stroke="#fff2a0" stroke-width="9"/>
+ <path d="M158 211 Q256 239 354 211 L347 246 Q256 264 165 246Z" fill="url(#gold)"/>
+ <!-- jewel details -->
+ <path d="M256 70 278 116 256 151 234 116Z" fill="#fff2a0" stroke="#b65d00" stroke-width="4"/>
+ <circle cx="146" cy="101" r="11" fill="#fff7c4"/><circle cx="366" cy="101" r="11" fill="#fff7c4"/>
+ <!-- neck and body -->
+ <path d="M188 248 Q207 276 205 306 Q201 360 159 410 Q256 438 353 410 Q311 360 307 306 Q305 276 324 248Z" fill="url(#body)"/>
+ <path d="M205 267 Q222 305 218 345 Q215 377 191 407" fill="none" stroke="#fff3a1" stroke-width="8" opacity=".8"/>
+ <path d="M307 267 Q290 305 294 345 Q297 377 321 407" fill="none" stroke="#7d3600" stroke-width="8" opacity=".8"/>
+ <!-- collars -->
+ <path d="M169 236 Q256 258 343 236 L351 258 Q256 286 161 258Z" fill="url(#gold)"/>
+ <path d="M151 401 Q256 430 361 401 L379 431 Q256 463 133 431Z" fill="url(#gold)"/>
+ <path d="M132 431 Q256 464 380 431 L392 459 Q256 492 120 459Z" fill="url(#gold)"/>
+ <path d="M145 446 Q256 473 367 446" fill="none" stroke="#fff5ad" stroke-width="7"/>
+</g></svg>
