@@ -112,6 +112,7 @@ select.toolbtn{background:var(--panel2);border:0}
 .sidegame h2{font-size:18px;margin:0 0 6px;color:var(--strong);font-weight:500}
 .status{background:var(--panel3);border-radius:3px;padding:11px;margin:12px 0;font-size:13px}
 .status strong{display:block;margin-bottom:2px;color:var(--strong)}
+.notation-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:15px 0 8px}.notation-head h3{font-size:14px;margin:0}.notation-sheet{max-height:230px;min-height:72px;overflow:auto;border:1px solid var(--line);border-radius:9px;background:var(--panel3);font-size:13px;font-variant-numeric:tabular-nums}.notation-row{display:grid;grid-template-columns:38px minmax(0,1fr) minmax(0,1fr);align-items:center;gap:5px;padding:5px 8px;border-bottom:1px solid var(--line)}.notation-row:last-child{border-bottom:0}.notation-number{color:var(--muted);text-align:right;padding-right:5px}.notation-move{min-width:0;padding:4px 6px;border-radius:5px;font-weight:700}.notation-move.current{background:var(--green2);color:#10150f}.notation-move.empty{color:var(--muted);font-weight:400}.notation-empty{padding:16px;color:var(--muted);text-align:center}@media(max-width:420px){.notation-sheet{max-height:190px}.notation-row{grid-template-columns:30px minmax(0,1fr) minmax(0,1fr);padding:5px 6px}}
 .moves{min-height:65px;max-height:200px;overflow:auto;font-size:13px;color:var(--text);font-variant-numeric:tabular-nums}
 .moves ol{margin:0;padding-left:24px;columns:2}
 .moves li{padding:2px 0}
@@ -432,7 +433,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    <div class="tabcontent" id="gameTab"><h2>Ready to play?</h2><div class="desc">A simple chessboard for your next game.</div>
     <button class="greenbtn" id="startGame">Start a new game</button><button class="widebtn" id="playComputer">Play against computer</button>
     <div class="status"><strong id="statusTitle">White to move</strong><span id="statusText" class="muted">Select a piece to see where it can move.</span></div>
-    <h3 style="font-size:14px;margin:15px 0 8px">Move list</h3><div class="moves" id="moves"><span class="muted">Moves will appear here.</span></div>
+    <div class="notation-head"><h3>Move notation</h3><button class="toolbtn" id="copyNotation" type="button">Copy PGN</button></div><div class="notation-sheet" id="moves" aria-live="polite"><div class="notation-empty">Moves will appear here.</div></div>
     <div class="selectrow"><label for="pieceStyle">Piece style</label><select id="pieceStyle"><option value="friendly" selected>Friendly colors</option><option value="classic">Classic symbols</option><option value="bold">Bold solid</option></select></div>
     <div class="selectrow"><label for="boardTheme">Board theme</label><select id="boardTheme"><option value="royal" selected>Royal</option><option value="sunset">Sunset</option><option value="brown">Brown</option><option value="green">Green</option><option value="blue">Blue</option><option value="mono">Black & white</option></select></div>
     <div class="selectrow"><label for="fxMode">Fun effects</label><select id="fxMode"><option value="boom">Explosions</option><option value="boomsound">Explosions + sound</option><option value="fireworks">Fireworks</option><option value="confetti">Confetti rain</option><option value="stars">Star burst</option><option value="all">ALL effects together</option><option value="off">Off</option></select></div>
@@ -553,10 +554,11 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   $('statusText').textContent=game.in_checkmate()?(turn==='w'?'Black':'White')+' wins. Start another game to play again.':game.in_draw()?'The game is drawn.':game.in_check()?'The king is under attack. Find a safe move.':selected?'Choose a highlighted square.':'Select a piece to see its legal moves.';
   $('turnFoot').textContent=over?'Game over':(turn==='w'?'White':'Black')+' to move';$('moveCount').textContent='Move '+(Math.floor(history.length/2)+1);
   paintClocks();
-  $('moves').innerHTML=history.length?'<ol>'+history.filter((_,i)=>i%2===0).map((m,i)=>'<li>'+m+(history[i*2+1]?' &nbsp; '+history[i*2+1]:'')+'</li>').join('')+'</ol>':'<span class="muted">Moves will appear here.</span>';
+  const notationRows=[];for(let i=0;i<history.length;i+=2){const n=i/2+1,w=history[i],b=history[i+1]||'';notationRows.push('<div class="notation-row"><span class="notation-number">'+n+'.</span><span class="notation-move '+(i===history.length-1?'current':'')+'">'+w+'</span><span class="notation-move '+(i+1===history.length-1?'current':'')+(b?'':' empty')+'">'+(b||'…')+'</span></div>')}$('moves').innerHTML=notationRows.length?notationRows.join(''):'<div class="notation-empty">Your moves will appear here.</div>';
   $('opponentSub').textContent=onlineGameId?$('opponentSub').textContent:computerMode?'MaxChess computer · '+computerLevel+' rated':'Local two-player game';
   finalizeRating();
  }
+ const copyNotationButton=$('copyNotation');if(copyNotationButton)copyNotationButton.onclick=async()=>{try{const pgn=game.pgn({newline:'\n'});await navigator.clipboard.writeText(pgn||'[Event "MaxChess game"]\n\n*');note('Game notation copied as PGN.')}catch(e){note('Could not copy notation. Use Download PGN instead.')}};
  let promoChoice=null;
  function askPromotion(sq){const m=$('promoModal'),w=game.turn()==='w',g={q:w?'♕':'♛',r:w?'♖':'♜',b:w?'♗':'♝',n:w?'♘':'♞'},box=$('promoChoices');box.innerHTML='';
   ['q','r','b','n'].forEach(t=>{const bt=document.createElement('button');bt.type='button';bt.className='promo-btn';bt.textContent=g[t];bt.setAttribute('aria-label','Promote to '+{q:'queen',r:'rook',b:'bishop',n:'knight'}[t]);bt.onclick=()=>{m.classList.remove('open');promoChoice=t;tap(sq)};box.appendChild(bt)});
