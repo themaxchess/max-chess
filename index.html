@@ -486,7 +486,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    <div class="tabcontent" id="gameTab"><h2>Ready to play?</h2><div class="desc">A simple chessboard for your next game.</div>
     <button class="greenbtn" id="startGame">Start a new game</button><button class="widebtn" id="playComputer">Play against computer</button>
     <div class="status"><strong id="statusTitle">White to move</strong><span id="statusText" class="muted">Select a piece to see where it can move.</span></div>
-    <div class="notation-head"><h3>Move notation</h3><button class="toolbtn" id="copyNotation" type="button">Copy PGN</button></div><div class="notation-sheet" id="moves" aria-live="polite"><div class="notation-empty">Moves will appear here.</div></div>
+    <div class="notation-head"><h3>Move notation</h3><button class="toolbtn" id="copyNotation" type="button">Copy PGN</button><button class="toolbtn" id="retryLichessImport" type="button" hidden>Import to Lichess</button></div><div class="notation-sheet" id="moves" aria-live="polite"><div class="notation-empty">Moves will appear here.</div></div>
     <div class="selectrow"><label for="pieceStyle">Piece style</label><select id="pieceStyle"><option value="friendly" selected>Friendly colors</option><option value="classic">Classic symbols</option><option value="bold">Bold solid</option></select></div>
     <div class="selectrow"><label for="boardTheme">Board theme</label><select id="boardTheme"><option value="royal" selected>Royal</option><option value="sunset">Sunset</option><option value="brown">Brown</option><option value="green">Green</option><option value="blue">Blue</option><option value="mono">Black & white</option></select></div>
     <div class="selectrow"><label for="fxMode">Fun effects</label><select id="fxMode"><option value="boom">Explosions</option><option value="boomsound">Explosions + sound</option><option value="fireworks">Fireworks</option><option value="confetti">Confetti rain</option><option value="stars">Star burst</option><option value="all">ALL effects together</option><option value="off">Off</option></select></div>
@@ -588,28 +588,33 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  function paintRating(){const n=$('ratingNumber'),r=$('ratingRecord');if(n)n.textContent=ratingData.rating;const h=$('homeRatingNumber');if(h)h.textContent=ratingData.rating;if(r)r.textContent=ratingData.wins+' wins · '+ratingData.losses+' losses · '+ratingData.draws+' draws';const cr=$('computerRatingDisplay');if(cr)cr.textContent=computerRatingData.rating;['computerWins','computerLosses','computerDraws'].forEach((id,i)=>{const el=$(id);if(el)el.textContent=[computerRatingData.wins,computerRatingData.losses,computerRatingData.draws][i]});paintHomeStats()}function paintHomeStats(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};put('hqPracticeRating',ratingData.rating);put('hqPuzzleRating',localStorage.getItem('maxchess_puzzle_rating')||800);put('hqWins',ratingData.wins);put('hqGames',ratingData.wins+ratingData.losses+ratingData.draws)}
  function finalizeRating(){if(!game||!game.game_over()||!computerMode||ratingFinalized)return;ratingFinalized=true;let score=0.5,result='draw';if(game.in_checkmate()){if(game.turn()==='b'){score=1;result='win';computerRatingData.wins++}else{score=0;result='loss';computerRatingData.losses++}}else if(game.in_draw()){computerRatingData.draws++}else return;const expected=1/(1+Math.pow(10,(computerLevel-computerRatingData.rating)/400));const change=Math.round(32*(score-expected));computerRatingData.rating=Math.max(100,Math.min(4000,computerRatingData.rating+change));try{localStorage.setItem(computerRatingKey,JSON.stringify(computerRatingData))}catch(e){}paintRating();saveProgressCloud();note(result==='win'?'You won! Rating '+(change>=0?'+':'')+change+'.':result==='loss'?'Game lost. Rating '+change+'.':'Draw! Rating '+(change>=0?'+':'')+change+'.')}
  async function importLocalCompletedGame(){
-  if(localLichessImportAttempted||!game||!game.game_over()||onlineGameId)return;
+  if(!game||!game.game_over()||onlineGameId)return;
+  const retryButton=$('retryLichessImport');
+  if(localLichessImportAttempted)return;
+  if(retryButton){retryButton.hidden=false;retryButton.disabled=true;retryButton.textContent='Importing to Lichess…'}
   try{
-   if(!authClient){note('Sign in with Lichess first, then start a new game to import it.');return}
+   if(!authClient)throw new Error('MaxChess account service is unavailable. Refresh and try again.');
    const sessionResult=await authClient.auth.getSession();
    if(sessionResult.error)throw sessionResult.error;
-   if(!sessionResult.data?.session?.access_token){note('Your MaxChess session is not linked to Lichess. Use Sign in with Lichess, then play a new game.');return}
+   if(!sessionResult.data?.session?.access_token)throw new Error('Sign in with Lichess, then tap Import to Lichess.');
    const resultTag=game.isCheckmate()?(game.turn()==='w'?'0-1':'1-0'):'1/2-1/2';
    const now=new Date();
    const dateTag=now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0');
-   const moves=game.pgn().replace(/\\s*(?:\\*|1-0|0-1|1\\/2-1\\/2)\\s*$/,'').trim();
+   const moves=game.pgn().replace(/\s*(?:\*|1-0|0-1|1\/2-1\/2)\s*$/,'').trim();
    const white=computerMode?'MaxChess Player':'Player 1';
    const black=computerMode?'MaxChess Computer':'Player 2';
-   const pgn='[Event "MaxChess"]\\n[Site "https://themaxchessss.github.io"]\\n[Date "'+dateTag+'"]\\n[White "'+white+'"]\\n[Black "'+black+'"]\\n[Result "'+resultTag+'"]\\n\\n'+moves+'\\n'+resultTag;
+   const pgn='[Event "MaxChess"]\n[Site "https://themaxchessss.github.io"]\n[Date "'+dateTag+'"]\n[White "'+white+'"]\n[Black "'+black+'"]\n[Result "'+resultTag+'"]\n\n'+moves+'\n'+resultTag;
    const clientGameId=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2));
-   localLichessImportAttempted=true;
    const response=await authClient.functions.invoke('maxchess-lichess-import-local',{body:{pgn,client_game_id:clientGameId}});
    if(response.error||response.data?.error)throw new Error(response.data?.error||response.error?.message||'Lichess import failed.');
+   localLichessImportAttempted=true;
+   if(retryButton){retryButton.disabled=true;retryButton.textContent='Imported to Lichess ✓'}
    if(response.data?.url)note('Imported to Lichess! Open your game: '+response.data.url);
    else note('MaxChess sent your completed game to Lichess.');
   }catch(error){
    localLichessImportAttempted=false;
-   note('Lichess import failed: '+(error?.message||'Sign in with Lichess again and retry with a new game.'));
+   if(retryButton){retryButton.disabled=false;retryButton.textContent='Retry Lichess import'}
+   note('Lichess import failed: '+(error?.message||'Sign in with Lichess again and retry.'));
   }
  }
  const files='abcdefgh';
@@ -645,6 +650,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   if(over&&!onlineGameId)importLocalCompletedGame();
  }
  const copyNotationButton=$('copyNotation');if(copyNotationButton)copyNotationButton.onclick=async()=>{try{const pgn=game.pgn({newline:'\n'});await navigator.clipboard.writeText(pgn||'[Event "MaxChess game"]\n\n*');note('Game notation copied as PGN.')}catch(e){note('Could not copy notation. Use Download PGN instead.')}};
+ const retryLichessButton=$('retryLichessImport');if(retryLichessButton)retryLichessButton.onclick=()=>{localLichessImportAttempted=false;importLocalCompletedGame()};
  let promoChoice=null;
  function askPromotion(sq){const m=$('promoModal'),w=game.turn()==='w',g={q:w?'♕':'♛',r:w?'♖':'♜',b:w?'♗':'♝',n:w?'♘':'♞'},box=$('promoChoices');box.innerHTML='';
   ['q','r','b','n'].forEach(t=>{const bt=document.createElement('button');bt.type='button';bt.className='promo-btn';bt.textContent=g[t];bt.setAttribute('aria-label','Promote to '+{q:'queen',r:'rook',b:'bishop',n:'knight'}[t]);bt.onclick=()=>{m.classList.remove('open');promoChoice=t;tap(sq)};box.appendChild(bt)});
@@ -668,7 +674,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  }
  function computerMove(){if(!game||game.game_over()||game.turn()!=='b'||!computerMode||thinking)return;thinking=true;stockfishPurpose='computer';stockfishFen=game.fen();const requestedFen=stockfishFen;$('statusText').textContent='MaxChess is thinking…';if(!createStockfishWorker()){computerMoveFallback();return}if(stockfishReady)launchStockfishComputerMove();setTimeout(()=>{if(game&&computerMode&&!game.game_over()&&game.turn()==='b'&&game.fen()===requestedFen&&thinking){try{if(stockfishWorker)stockfishWorker.postMessage('stop')}catch(e){}stockfishPurpose='analysis';computerMoveFallback();note('Computer engine took too long, so MaxChess used its backup move.')}},12000)}
 
- function reset(computer=false){if(!game)return;try{if(stockfishWorker)stockfishWorker.postMessage('stop')}catch(e){}thinking=false;stockfishPurpose='analysis';game.reset();ratingFinalized=false;localLichessImportAttempted=false;puzzleMode=false;if(onlineGameId||onlinePoll){onlineGameId=null;onlineColor=null;onlineBusy=false;$('onlineGameActions').style.display='none';if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}$('opponentName').textContent='Black pieces';$('onlineStatus').textContent='Sign in, then find an opponent anywhere on MaxChess.';loadGameChat()}selected=null;legal=[];lastMove=null;computerMode=computer;applyTcExtra();clockInitial=tcSecs();whiteSeconds=blackSeconds=clockInitial;clockStarted=false;clockPaused=false;flaggedSide=null;render();note(computer?'Beginner computer game started.':'New game started.')}
+ function reset(computer=false){if(!game)return;try{if(stockfishWorker)stockfishWorker.postMessage('stop')}catch(e){}thinking=false;stockfishPurpose='analysis';game.reset();ratingFinalized=false;localLichessImportAttempted=false;if($('retryLichessImport')){$('retryLichessImport').hidden=true;$('retryLichessImport').disabled=false;$('retryLichessImport').textContent='Import to Lichess'}puzzleMode=false;if(onlineGameId||onlinePoll){onlineGameId=null;onlineColor=null;onlineBusy=false;$('onlineGameActions').style.display='none';if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}$('opponentName').textContent='Black pieces';$('onlineStatus').textContent='Sign in, then find an opponent anywhere on MaxChess.';loadGameChat()}selected=null;legal=[];lastMove=null;computerMode=computer;applyTcExtra();clockInitial=tcSecs();whiteSeconds=blackSeconds=clockInitial;clockStarted=false;clockPaused=false;flaggedSide=null;render();note(computer?'Beginner computer game started.':'New game started.')}
  $('newGame').onclick=()=>reset(false);$('startGame').onclick=()=>reset(false);$('computerLevel').onchange=()=>{computerLevel=Number($('computerLevel').value)||800;note('Computer level set to '+computerLevel+'.')};$('undo').onclick=()=>{if(onlineGameId){note('Takeback is not available in online games.');return}if(game.undo()){if(computerMode&&game.turn()==='b')game.undo();selected=null;legal=[];lastMove=null;render();note('Last move taken back.')}else note('There are no moves to take back yet.')};$('flip').onclick=()=>{flipped=!flipped;render()};$('playComputer').onclick=()=>{reset(true);navigate('play')};$('computerStart').onclick=()=>{computerLevel=Number($('computerLevel').value)||800;reset(true);navigate('play');note('Rated computer game started · opponent '+computerLevel+'.')};$('analysisStart').onclick=()=>navigate('play');$('openingStart').onclick=()=>navigate('play');$('practiceStart').onclick=()=>navigate('play');$('puzzleStart').onclick=()=>navigate('play');
  $('hint').onclick=()=>{if(!game||game.game_over()){note('Start a game first.');return}let ms=game.moves({verbose:true});if(!ms.length)return;let checks=ms.filter(m=>m.san.includes('+')||m.san.includes('#')),caps=ms.filter(m=>m.captured),m=(checks[0]||caps[0]||ms[0]);selected=m.from;legal=game.moves({square:m.from,verbose:true});render();note('Hint: look at '+m.from+' and consider '+m.san+'.')};
 
@@ -1188,7 +1194,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
      mine.append(card);
     });
     if(!classes.some(cl=>cl.teacher))dash.textContent='Create a class to see its student roster.';
-   }catch(error){mine.textContent='Could not load classes: '+(error?.message||'Network error. Check your connection and try again.')}
+   }catch(error){const message='Could not load classes: '+(error?.message||'Network error. Check your connection and try again.');mine.textContent=message;dash.textContent=message}
   }
   let schoolLichessRequestQueue=Promise.resolve();
   async function schoolFetchLichessProfile(username){
@@ -1221,11 +1227,13 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   }
   async function schoolRoster(classId){
    const out=$('schoolTeacherDashboard');out.textContent='Loading student progress…';
-   const q=await authClient.rpc('maxchess_school_roster',{p_class:classId});
-   if(q.error){out.textContent='Could not load roster: '+q.error.message;return}
+   try{
+    const q=await authClient.rpc('maxchess_school_roster',{p_class:classId});
+    if(q.error)throw q.error;
    if(!q.data?.length){out.textContent='No students have joined this class yet.';return}
    const table=document.createElement('div');
    q.data.forEach(st=>{const row=document.createElement('div');row.style.cssText='padding:10px 0;border-bottom:1px solid var(--line)';const name=document.createElement('b');name.textContent=st.username+' · '+st.rating+' MaxChess rating';row.append(name);const gameCount=document.createElement('small');gameCount.textContent='MaxChess games completed: '+Number(st.maxchess_games_played||0);row.append(gameCount);const links=document.createElement('div');links.className='muted';if(st.lichess_username){const a=document.createElement('a');a.href='https://lichess.org/@/'+encodeURIComponent(st.lichess_username);a.target='_blank';a.rel='noopener noreferrer';a.textContent='Lichess profile: '+st.lichess_username+' (public profile found)';links.append(a);const stat=document.createElement('p');stat.textContent='Loading Lichess ratings…';links.append(stat);schoolPublicStats('lichess',st.lichess_username).then(x=>stat.textContent='Lichess public ratings: '+x)}if(st.chesscom_username){const a=document.createElement('a');a.href='https://www.chess.com/member/'+encodeURIComponent(st.chesscom_username);a.target='_blank';a.rel='noopener noreferrer';a.textContent='Chess.com: '+st.chesscom_username+' (username not verified)';links.append(a);const stat=document.createElement('p');stat.textContent='Loading Chess.com ratings…';links.append(stat);schoolPublicStats('chesscom',st.chesscom_username).then(x=>stat.textContent='Chess.com public ratings: '+x)}if(!st.lichess_username&&!st.chesscom_username)links.textContent='No external accounts shared';row.append(links);const joined=document.createElement('small');joined.textContent='Joined '+new Date(st.joined_at).toLocaleDateString();row.append(joined);table.append(row)});out.replaceChildren(table);
+   }catch(error){out.textContent='Could not load teacher roster: '+(error?.message||'Network error. Refresh and try again.')}
   }
   $('schoolCreateClass').onclick=async()=>{
    const out=$('schoolCreateStatus'),btn=$('schoolCreateClass'),className=$('schoolClassName').value.trim();
