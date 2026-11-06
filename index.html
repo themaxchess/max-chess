@@ -332,6 +332,43 @@ body{background:radial-gradient(1100px 600px at 85% -10%,#2b2380 0%,transparent 
   .boardtools .toolbtn{min-height:40px}
 }
 button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
+
+/* MaxChess mobile and iPad usability improvements */
+@media (max-width:760px){
+  .topbar{gap:8px}
+  .topnav{gap:3px}
+  .navgroup{min-width:0}
+  .navtop{min-height:42px;border-radius:7px}
+  .dropdown{max-width:min(88vw,280px)}
+  .topright{gap:4px}
+  .toplink,.login,.signup{min-height:42px;display:inline-flex;align-items:center;justify-content:center}
+  .playgrid{gap:14px}
+  .boardcol{width:100%;max-width:640px;margin-inline:auto}
+  .boardtools{gap:8px}
+  .boardtools button,.boardtools select,.toolbtn{min-height:42px}
+  .tab{min-height:44px}
+  .tc-btn,.home-row,.lesson,.feature{min-height:48px}
+  .account-card{padding:22px 18px}
+  .account-card input,.account-actions button{min-height:46px;font-size:16px}
+}
+@media (max-width:520px){
+  .main{padding-left:10px;padding-right:10px}
+  .boardcol{max-width:min(100%, 560px)}
+  .sq{font-size:clamp(22px, 10.2vw, 48px)}
+  .playerbar{padding:7px 9px}
+  .clock{font-size:19px;padding:3px 8px}
+  .boardtools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .boardtools>*{width:100%;max-width:none!important;min-width:0}
+  .boardfoot{flex-wrap:wrap}
+  .tabcontent{padding:12px}
+  .status{padding:10px}
+  .extras{gap:8px}
+}
+@media (hover:none) and (pointer:coarse){
+  .sq{touch-action:manipulation}
+  .navtop,.dropdown .navitem,.toolbtn,.greenbtn,.widebtn,.tc-btn,.home-row,.lesson,.feature{ -webkit-tap-highlight-color:transparent}
+  button{ -webkit-touch-callout:none}
+}
 </style>
 </head>
 <body>
