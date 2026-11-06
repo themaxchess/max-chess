@@ -369,6 +369,10 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   .navtop,.dropdown .navitem,.toolbtn,.greenbtn,.widebtn,.tc-btn,.home-row,.lesson,.feature{ -webkit-tap-highlight-color:transparent}
   button{ -webkit-touch-callout:none}
 }
+
+/* MaxChess daily mission */
+.max-daily{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 20px;align-items:center;margin:22px 0;padding:18px 20px;background:linear-gradient(120deg,#29251c,#24221f);border:1px solid #80652c;border-radius:12px;box-shadow:0 8px 24px #0003}
+.max-daily-kicker{font-size:11px;font-weight:900;letter-spacing:1.5px;color:#e8c765}.max-daily h2{margin:4px 0;color:#f4e7c1;font-size:20px}.max-daily p{margin:4px 0}.max-daily-note{font-size:12px;color:#b7aa8d}.max-daily-button{background:#d5ad4e;color:#211b0d;font-weight:900;padding:12px 16px;border-radius:8px;min-height:46px}.max-daily-button:hover{background:#f0d27c}.max-daily-button:focus-visible{outline:3px solid #fff;outline-offset:3px}.max-daily-button:disabled{opacity:.85;cursor:default}.max-daily-status{grid-column:1/-1;font-size:13px;color:#f0d27c;min-height:18px}@media(max-width:620px){.max-daily{grid-template-columns:1fr}.max-daily-button{width:100%}}
 </style>
 </head>
 <body>
@@ -430,6 +434,12 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   </div>
   <div class="hero-art"><div class="home-board-art" aria-hidden="true"></div></div>
  </div>
+
+ <section class="max-daily" id="maxDailyChallenge" aria-labelledby="maxDailyTitle">
+  <div><span class="max-daily-kicker">♟ DAILY TRAINING</span><h2 id="maxDailyTitle">Your 5-minute chess mission</h2><p id="maxDailyTask">Play one careful game and review one mistake.</p><p class="max-daily-note">A small daily habit builds stronger chess thinking.</p></div>
+  <button type="button" id="maxDailyDone" class="max-daily-button">Mark today's mission complete</button>
+  <span id="maxDailyStatus" class="max-daily-status" role="status" aria-live="polite"></span>
+ </section>
  <div class="cards">
   <button class="card" data-homegoto="puzzles" type="button"><span class="ci">♞</span><b>Puzzles</b><small>Sharpen your tactics</small></button>
   <button class="card" data-homegoto="learn" type="button"><span class="ci">▤</span><b>Learn</b><small>Lessons for every level</small></button>
@@ -1064,5 +1074,8 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   <div style="margin-top:6px">Original MaxChess website content, design and code are protected by copyright where applicable. Third-party software and assets remain subject to their respective licences.</div>
 </footer>
 
+
+/* MaxChess daily mission: local to this device, resets each calendar day. */
+(function(){const card=document.getElementById('maxDailyChallenge');if(!card)return;const tasks=['Play one careful game and review one mistake.','Solve three tactics puzzles without guessing.','Practise developing both knights and bishops.','Play a 5-minute game and check your king safety.','Find one useful move for every piece before moving.','Review a game and spot your biggest missed opportunity.','Practise checkmate patterns for five minutes.'];const now=new Date(),day=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');let hash=0;for(let i=0;i<day.length;i++)hash=(hash*31+day.charCodeAt(i))>>>0;document.getElementById('maxDailyTask').textContent=tasks[hash%tasks.length];const key='maxchess_daily_done_'+day,btn=document.getElementById('maxDailyDone'),status=document.getElementById('maxDailyStatus');function paint(){const done=localStorage.getItem(key)==='1';btn.disabled=done;btn.textContent=done?'✓ Mission completed today':'Mark today\'s mission complete';status.textContent=done?'Great work! Your progress is saved on this device.':'Your mission is ready. You can complete it any time today.'}btn.addEventListener('click',function(){localStorage.setItem(key,'1');paint()});try{paint()}catch(e){status.textContent='Daily mission ready. Progress saving is unavailable in this browser.';btn.addEventListener('click',()=>{status.textContent='Nice work completing your daily mission!'})}})();
 </body>
 </html>
