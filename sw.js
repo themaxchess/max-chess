@@ -1,4 +1,4 @@
-const CACHE_NAME = "maxchess-shell-v18";
+const CACHE_NAME = "maxchess-shell-v19";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -21,13 +21,12 @@ self.addEventListener("fetch", event => {
   const staticLocal = url.origin === self.location.origin && /\.(?:svg|png|jpg|jpeg|webp|css|js|woff2?)$/i.test(url.pathname);
   if (!staticExternal && !staticLocal) return;
   event.respondWith(caches.match(request).then(cached => {
-    const fresh = fetch(request).then(response => {
+    return fetch(request).then(response => {
       if (response && (response.ok || response.type === "opaque")) {
         const copy = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
       }
       return response;
-    }).catch(() => cached);
-    return cached || fresh;
+    }).catch(() => cached || caches.match(request));
   }));
 });
