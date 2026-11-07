@@ -383,6 +383,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
 .max-daily-kicker{font-size:11px;font-weight:900;letter-spacing:1.5px;color:#e8c765}.max-daily h2{margin:4px 0;color:#f4e7c1;font-size:20px}.max-daily p{margin:4px 0}.max-daily-note{font-size:12px;color:#b7aa8d}.max-daily-button{background:#d5ad4e;color:#211b0d;font-weight:900;padding:12px 16px;border-radius:8px;min-height:46px}.max-daily-button:hover{background:#f0d27c}.max-daily-button:focus-visible{outline:3px solid #fff;outline-offset:3px}.max-daily-button:disabled{opacity:.85;cursor:default}.max-daily-status{grid-column:1/-1;font-size:13px;color:#f0d27c;min-height:18px}@media(max-width:620px){.max-daily{grid-template-columns:1fr}.max-daily-button{width:100%}}
 
 /* Printable MaxChess business cards */
+.card-gallery{margin-top:30px}.card-gallery h3{color:var(--strong);font-weight:600}.card-gallery .gifcard img{background:#fff}.gallery-file{display:grid;place-items:center;width:100%;min-height:150px;font-size:56px;background:var(--panel2);border-radius:8px}
 .card-editor label{display:block;margin:12px 0 5px;color:var(--strong);font-size:13px;font-weight:700}
 .card-editor input{display:block;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:var(--panel3);color:var(--strong)}
 .card-preview-wrap{margin-top:22px}.card-preview-wrap h3{color:var(--strong);font-weight:600}
@@ -425,6 +426,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  #page-business-cards .max-business-card{width:3.5in;height:2in;aspect-ratio:auto;border:1px dashed #777;border-radius:0;box-shadow:none;padding:.16in;print-color-adjust:exact;-webkit-print-color-adjust:exact}
  #page-business-cards .max-business-card.back-card .mbc-back-qr{width:1.05in;height:1.05in;flex-basis:auto}
  #page-business-cards .card-back-heading{display:none!important}
+ #page-business-cards .card-gallery{display:none!important}
  #page-business-cards .max-business-card .mbc-name{font-size:19pt}
  #page-business-cards .max-business-card .mbc-title{font-size:10pt}
  #page-business-cards .max-business-card .mbc-foot{font-size:7.5pt}
@@ -627,6 +629,19 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    <div class="print-card-sheet" id="printCardSheet" aria-label="Preview of eight printable MaxChess business card fronts"></div>
    <h3 class="card-back-heading">Back — 8 cards (website QR code)</h3>
    <div class="print-card-sheet card-back-sheet" id="printCardBackSheet" aria-label="Preview of eight printable MaxChess business card backs"></div>
+  </div>
+  <div class="card-gallery">
+   <h3>MaxChess card designs</h3>
+   <p class="muted">Ready-made MaxChess cards you can save, share or print. Ask a parent or guardian before printing or handing cards out.</p>
+   <div class="gifgrid">
+ <div class="puzzlebox gifcard"><img src="cards/maxchess-cards-front-sheet.png" alt="MaxChess business card sheet, front side: ten cards with a king chess piece, the name MaxChess, Play Free Chess! and the website address" width="1435" height="1870" loading="lazy"><b>Front side: 10 cards</b><p class="muted">The full front sheet: the king piece, the MaxChess name and the website address.</p><a class="widebtn" href="cards/maxchess-cards-front-sheet.png" download="maxchess-cards-front-sheet.png">Download image</a></div>
+ <div class="puzzlebox gifcard"><img src="cards/maxchess-cards-back-sheet.png" alt="MaxChess business card sheet, back side: ten cards with a pawn, Scan to visit our website! and a QR code" width="1434" height="1871" loading="lazy"><b>Back side: 10 cards</b><p class="muted">The full back sheet: a pawn, "Scan to visit our website!" and the QR code.</p><a class="widebtn" href="cards/maxchess-cards-back-sheet.png" download="maxchess-cards-back-sheet.png">Download image</a></div>
+ <div class="puzzlebox gifcard"><div class="gallery-file" aria-hidden="true">📄</div><b>Double-sided print file (PDF)</b><p class="muted">Page 1 is the fronts and page 2 is the backs. Print double-sided with "flip on long edge" at 100% size, then cut along the borders.</p><a class="widebtn" href="cards/maxchess-cards-double-sided.pdf" download="maxchess-cards-double-sided.pdf">Download PDF</a></div>
+ <div class="puzzlebox gifcard"><img src="cards/maxchess-card-front.png" alt="One MaxChess business card front with a king chess piece, the name MaxChess, Play Free Chess! and the website address" width="1104" height="573" loading="lazy"><b>Single card: front</b><p class="muted">One front card as an image.</p><a class="widebtn" href="cards/maxchess-card-front.png" download="maxchess-card-front.png">Download image</a></div>
+ <div class="puzzlebox gifcard"><img src="cards/maxchess-card-back.png" alt="One MaxChess business card back with a pawn, Scan to visit our website! and a QR code" width="1083" height="573" loading="lazy"><b>Single card: back</b><p class="muted">One back card as an image.</p><a class="widebtn" href="cards/maxchess-card-back.png" download="maxchess-card-back.png">Download image</a></div>
+ <div class="puzzlebox gifcard"><img src="cards/maxchess-qr-code.png" alt="Styled QR code with a SCAN ME label that links to the MaxChess website" width="800" height="1048" loading="lazy"><b>QR code: styled</b><p class="muted">Round corner markers and a "SCAN ME" label. Goes to themaxchessss.github.io.</p><a class="widebtn" href="cards/maxchess-qr-code.png" download="maxchess-qr-code.png">Download image</a></div>
+ <div class="puzzlebox gifcard"><img src="cards/maxchess-qr-plain.png" alt="Plain black and white QR code that links to the MaxChess website" width="1480" height="1480" loading="lazy"><b>QR code: plain</b><p class="muted">A simple black-and-white QR code. Goes to themaxchessss.github.io.</p><a class="widebtn" href="cards/maxchess-qr-plain.png" download="maxchess-qr-plain.png">Download image</a></div>
+   </div>
   </div>
  </div>
 </section>
