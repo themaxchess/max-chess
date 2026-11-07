@@ -450,6 +450,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    <button class="navitem" data-page="donate">Support MaxChess</button>
    <button class="navitem" data-page="about">About MaxChess</button>
    <button class="navitem" data-page="business-cards">Printable Business Cards</button>
+   <button class="navitem" data-page="card-cutter">Help cut MaxChess cards</button>
   </div></div>
   <div class="navgroup"><button type="button" class="navtop">Tools</button><div class="dropdown">
    <button class="navitem" data-page="analysis">Analysis board</button>
@@ -603,6 +604,26 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   </div>
  </div>
 </section>
+<section class="pageview" id="page-card-cutter"><div class="simplepage">
+ <h2>✂️ Want to Help Cut MaxChess Cards?</h2>
+ <p class="muted">MaxChess is looking for careful helpers who can cut printed business-card sheets along the dashed lines.</p>
+ <div class="puzzlebox">
+  <h3>Card cutter helper</h3>
+  <ul>
+   <li>Print a MaxChess business-card sheet with permission.</li>
+   <li>Carefully cut along the dashed borders using safe, age-appropriate tools.</li>
+   <li>Keep the cards neat and in good condition.</li>
+  </ul>
+  <p><b>Interested?</b> Fill in a nickname and a short note, then copy the application message to share with a parent or guardian.</p>
+  <label for="cutterApplicantName">First name or nickname</label>
+  <input id="cutterApplicantName" maxlength="30" placeholder="Your first name or nickname" style="display:block;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:var(--panel3);color:var(--strong)">
+  <label for="cutterApplicantNote">Why would you like to help? (optional)</label>
+  <textarea id="cutterApplicantNote" maxlength="400" rows="3" placeholder="I would like to help because…" style="display:block;width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:var(--panel3);color:var(--strong)"></textarea>
+  <button class="greenbtn" type="button" id="copyCutterApplication">Copy application message</button>
+  <p id="cutterApplicationStatus" class="desc" role="status" aria-live="polite">This copies a message; it does not send an application automatically.</p>
+ </div>
+ <p class="desc">Safety: ask a parent or guardian before applying, printing, using scissors or a paper cutter, or sharing any information. A parent or guardian should supervise cutting. This page is an expression-of-interest form, not a job offer; tasks, timing, and any payment must be agreed with a parent or guardian before work begins.</p>
+</div></section>
 <section class="pageview" id="page-about"><div class="simplepage"><h2>About MaxChess</h2><div class="puzzlebox"><p><b>Chess should be fun and accessible.</b></p><p>MaxChess is a free chess-learning project with a playable board, beginner lessons, board themes, and move history. No subscription is needed.</p><p class="muted">This is an independent project inspired by the clean, community-focused style of modern chess sites; it is not affiliated with Lichess.</p></div></div></section>
 <section class="pageview" id="page-gifs"><div class="simplepage"><h2>MaxChess GIFs</h2><p class="muted">Animated MaxChess ads you can save and share. Right-click (or press and hold) a GIF to save it, or use the button.</p>
 <div class="gifgrid">
@@ -1437,6 +1458,16 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  }
  document.getElementById('printCardsButton').addEventListener('click',()=>printSheet(false));
  document.getElementById('saveCardsPdfButton').addEventListener('click',()=>printSheet(true));
+ const cutterApply=document.getElementById('copyCutterApplication');
+ cutterApply.addEventListener('click',async()=>{
+  const name=document.getElementById('cutterApplicantName').value.trim();
+  const note=document.getElementById('cutterApplicantNote').value.trim();
+  if(!name){document.getElementById('cutterApplicationStatus').textContent='Please enter a first name or nickname first.';return;}
+  const message='MaxChess card cutter helper application\\nName or nickname: '+name+'\\nWhy I would like to help: '+(note||'I would like to help cut MaxChess business cards.')+'\\nPlease contact my parent or guardian to discuss safe next steps.';
+  const status=document.getElementById('cutterApplicationStatus');
+  try{await navigator.clipboard.writeText(message);status.textContent='Application message copied. Share it with a parent or guardian.';}
+  catch(e){status.textContent='Clipboard is unavailable in this browser. Please select and copy this text: '+message;}
+ });
  document.getElementById('shareCardsButton').addEventListener('click',async()=>{
   const name=clean('printCardName')||'MaxChess Player';
   const lichess=clean('printCardLichess').replace(/^@/,'');
