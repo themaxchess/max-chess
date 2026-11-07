@@ -619,8 +619,11 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   <input id="cutterApplicantName" maxlength="30" placeholder="Your first name or nickname" style="display:block;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:var(--panel3);color:var(--strong)">
   <label for="cutterApplicantNote">Why would you like to help? (optional)</label>
   <textarea id="cutterApplicantNote" maxlength="400" rows="3" placeholder="I would like to help because…" style="display:block;width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:var(--panel3);color:var(--strong)"></textarea>
-  <button class="greenbtn" type="button" id="copyCutterApplication">Copy application message</button>
-  <p id="cutterApplicationStatus" class="desc" role="status" aria-live="polite">This copies a message; it does not send an application automatically.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+   <button class="greenbtn" type="button" id="emailCutterApplication">✉️ Email application</button>
+   <button class="widebtn" type="button" id="copyCutterApplication">Copy application message</button>
+  </div>
+  <p id="cutterApplicationStatus" class="desc" role="status" aria-live="polite">Email opens a message addressed to mbeaton36@outlook.com. Review it with a parent or guardian and press Send in your email app.</p>
  </div>
  <p class="desc">Safety: ask a parent or guardian before applying, printing, using scissors or a paper cutter, or sharing any information. A parent or guardian should supervise cutting. This page is an expression-of-interest form, not a job offer; tasks, timing, and any payment must be agreed with a parent or guardian before work begins.</p>
 </div></section>
@@ -1458,15 +1461,24 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  }
  document.getElementById('printCardsButton').addEventListener('click',()=>printSheet(false));
  document.getElementById('saveCardsPdfButton').addEventListener('click',()=>printSheet(true));
- const cutterApply=document.getElementById('copyCutterApplication');
- cutterApply.addEventListener('click',async()=>{
+ function getCutterApplicationMessage(){
   const name=document.getElementById('cutterApplicantName').value.trim();
   const note=document.getElementById('cutterApplicantNote').value.trim();
-  if(!name){document.getElementById('cutterApplicationStatus').textContent='Please enter a first name or nickname first.';return;}
-  const message='MaxChess card cutter helper application\\nName or nickname: '+name+'\\nWhy I would like to help: '+(note||'I would like to help cut MaxChess business cards.')+'\\nPlease contact my parent or guardian to discuss safe next steps.';
+  if(!name){document.getElementById('cutterApplicationStatus').textContent='Please enter a first name or nickname first.';return null;}
+  return 'MaxChess card cutter helper application\\nName or nickname: '+name+'\\nWhy I would like to help: '+(note||'I would like to help cut MaxChess business cards.')+'\\nPlease contact my parent or guardian to discuss safe next steps.';
+ }
+ document.getElementById('copyCutterApplication').addEventListener('click',async()=>{
+  const message=getCutterApplicationMessage();if(!message)return;
   const status=document.getElementById('cutterApplicationStatus');
   try{await navigator.clipboard.writeText(message);status.textContent='Application message copied. Share it with a parent or guardian.';}
-  catch(e){status.textContent='Clipboard is unavailable in this browser. Please select and copy this text: '+message;}
+  catch(e){status.textContent='Clipboard is unavailable in this browser. Please copy this message: '+message;}
+ });
+ document.getElementById('emailCutterApplication').addEventListener('click',()=>{
+  const message=getCutterApplicationMessage();if(!message)return;
+  const subject='MaxChess card cutter helper application';
+  const mailto='mailto:mbeaton36@outlook.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(message);
+  document.getElementById('cutterApplicationStatus').textContent='Your email app should open with the application addressed to mbeaton36@outlook.com. Review it with a parent or guardian, then press Send.';
+  window.location.href=mailto;
  });
  document.getElementById('shareCardsButton').addEventListener('click',async()=>{
   const name=clean('printCardName')||'MaxChess Player';
