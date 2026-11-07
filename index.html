@@ -386,11 +386,23 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
 .card-preview-wrap{margin-top:22px}.card-preview-wrap h3{color:var(--strong);font-weight:600}
 .print-card-sheet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .max-business-card{position:relative;aspect-ratio:1.75/1;min-width:0;overflow:hidden;border:1px dashed #aaa;border-radius:8px;background:linear-gradient(135deg,#17152b,#29264b);color:#fff;padding:12px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 2px 8px #0005}
-.max-business-card:before{content:"♞";position:absolute;right:10px;top:0;font-size:62px;color:#e8c76522}
-.max-business-card .mbc-brand{font-size:10px;font-weight:900;letter-spacing:2px;color:#e8c765}
+.max-business-card .mbc-brand{font-size:10px;font-weight:900;letter-spacing:2px;color:#e8c765;display:flex;align-items:center;gap:5px}
+.max-business-card .mbc-trophy{font-size:20px;line-height:1}
 .max-business-card .mbc-name{font-size:clamp(13px,2.5vw,22px);font-weight:900;line-height:1.1;overflow-wrap:anywhere;color:#fff}
 .max-business-card .mbc-title{font-size:11px;color:#e8c765;font-weight:700}
-.max-business-card .mbc-foot{font-size:9px;line-height:1.35;color:#e7e6ef;overflow-wrap:anywhere}
+.max-business-card .mbc-bottom{display:flex;align-items:end;justify-content:space-between;gap:6px}
+.max-business-card .mbc-foot{font-size:9px;line-height:1.35;color:#e7e6ef;overflow-wrap:anywhere;min-width:0}
+.max-business-card .mbc-qr{width:48px;height:48px;flex:0 0 48px;background:#fff;padding:2px;border-radius:3px;object-fit:contain}
+.max-business-card.card-blue{background:linear-gradient(135deg,#082c55,#1474ad)}
+.max-business-card.card-blue .mbc-brand,.max-business-card.card-blue .mbc-title{color:#9fe5ff}
+.max-business-card.card-mono{background:#fff;color:#111;border:1px dashed #555}
+.max-business-card.card-mono .mbc-name{color:#111}
+.max-business-card.card-mono .mbc-brand,.max-business-card.card-mono .mbc-title{color:#222}
+.max-business-card.card-mono .mbc-foot{color:#333}
+.max-business-card.card-mono .mbc-trophy{filter:grayscale(1)}
+@media print{
+ #page-business-cards .max-business-card .mbc-qr{width:42px;height:42px;flex-basis:42px}
+}
 @media print{
  @page{size:letter portrait;margin:.35in}
  body{background:#fff!important;color:#111!important}
@@ -570,9 +582,17 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    <input id="printCardLichess" maxlength="30" placeholder="Your Lichess username">
    <label for="printCardExtra">Extra line (optional)</label>
    <input id="printCardExtra" maxlength="45" placeholder="e.g. Rapid • 1200">
-   <p class="desc">Only add details you are happy to share. Ask a parent or guardian before printing or sharing personal contact information.</p>
-   <button class="greenbtn" type="button" id="printCardsButton">🖨️ Print my 8 cards</button>
-   <p class="desc" id="printCardsStatus" role="status" aria-live="polite">Tip: choose “Actual size” or 100% in the print settings for standard business-card dimensions.</p>
+   <label for="printCardDesign">Card design</label>
+   <select id="printCardDesign" style="display:block;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:var(--panel3);color:var(--strong)">
+    <option value="card-gold">Gold &amp; midnight</option><option value="card-mono">Black &amp; white</option><option value="card-blue">Electric blue</option>
+   </select>
+   <p class="desc">Add a Lichess username to show a QR code linking to that public profile. Only add details you are happy to share. Ask a parent or guardian before sharing personal information.</p>
+   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+    <button class="greenbtn" type="button" id="printCardsButton">🖨️ Print 8 cards</button>
+    <button class="widebtn" type="button" id="saveCardsPdfButton">📄 Save as PDF</button>
+    <button class="widebtn" type="button" id="shareCardsButton">↗ Share</button>
+   </div>
+   <p class="desc" id="printCardsStatus" role="status" aria-live="polite">Print opens your print window. Choose “Actual size” or 100%; choose “Save as PDF” there to create a PDF file.</p>
   </div>
   <div class="card-preview-wrap">
    <h3>Preview — 8 cards</h3>
@@ -1371,34 +1391,61 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
 </script>
 
 <script>
-/* MaxChess printable business cards: eight copies, ready to cut. */
+/* MaxChess printable business cards: three designs, Lichess QR, print/PDF and share. */
 (function(){
  const sheet=document.getElementById('printCardSheet');
  if(!sheet)return;
  const fields=['printCardName','printCardTitle','printCardLichess','printCardExtra'];
  const clean=id=>document.getElementById(id).value.trim();
+ const status=document.getElementById('printCardsStatus');
  function paint(){
   const name=clean(fields[0])||'MaxChess Player';
   const title=clean(fields[1]);
-  const lichess=clean(fields[2]);
+  const lichess=clean(fields[2]).replace(/^@/,'');
   const extra=clean(fields[3]);
-  const foot=[extra,lichess?'Lichess: '+lichess:'', 'themaxchessss.github.io'].filter(Boolean).join('  •  ');
+  const design=document.getElementById('printCardDesign').value;
+  const foot=[extra,lichess?'Lichess: '+lichess:'','themaxchessss.github.io'].filter(Boolean).join('  •  ');
   sheet.replaceChildren();
   for(let i=0;i<8;i++){
-   const card=document.createElement('article');card.className='max-business-card';
-   const brand=document.createElement('div');brand.className='mbc-brand';brand.textContent='♞ MAXCHESS';
+   const card=document.createElement('article');card.className='max-business-card '+design;
+   const brand=document.createElement('div');brand.className='mbc-brand';
+   const trophy=document.createElement('span');trophy.className='mbc-trophy';trophy.textContent='🏆';
+   const brandText=document.createElement('span');brandText.textContent='MAXCHESS';
+   brand.append(trophy,brandText);
    const middle=document.createElement('div');
    const person=document.createElement('div');person.className='mbc-name';person.textContent=name;middle.append(person);
    if(title){const role=document.createElement('div');role.className='mbc-title';role.textContent=title;middle.append(role)}
-   const bottom=document.createElement('div');bottom.className='mbc-foot';bottom.textContent=foot;
+   const bottom=document.createElement('div');bottom.className='mbc-bottom';
+   const footEl=document.createElement('div');footEl.className='mbc-foot';footEl.textContent=foot;bottom.append(footEl);
+   if(lichess){
+    const qr=document.createElement('img');qr.className='mbc-qr';qr.alt='QR code for Lichess profile '+lichess;
+    qr.loading='eager';qr.src='https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=3&data='+encodeURIComponent('https://lichess.org/@/'+lichess);
+    bottom.append(qr);
+   }
    card.append(brand,middle,bottom);sheet.append(card);
   }
  }
  fields.forEach(id=>document.getElementById(id).addEventListener('input',paint));
- document.getElementById('printCardsButton').addEventListener('click',()=>{paint();document.getElementById('printCardsStatus').textContent='In the print window, choose Actual Size or 100% and print on letter-size paper. Cut along the dashed borders.';window.print()});
+ document.getElementById('printCardDesign').addEventListener('change',paint);
+ function printSheet(asPdf){
+  paint();
+  status.textContent=asPdf?'In the print window, choose “Save as PDF” as the destination, then save your eight-card sheet.':'In the print window, choose Actual Size or 100% and print on letter-size paper. Cut along the dashed borders.';
+  window.print();
+ }
+ document.getElementById('printCardsButton').addEventListener('click',()=>printSheet(false));
+ document.getElementById('saveCardsPdfButton').addEventListener('click',()=>printSheet(true));
+ document.getElementById('shareCardsButton').addEventListener('click',async()=>{
+  const name=clean('printCardName')||'MaxChess Player';
+  const lichess=clean('printCardLichess').replace(/^@/,'');
+  const shareData={title:'My MaxChess business card',text:'Check out my MaxChess card'+(lichess?' and Lichess profile: https://lichess.org/@/'+lichess:''),url:'https://themaxchessss.github.io/'};
+  try{
+   if(navigator.share){await navigator.share(shareData);status.textContent='Share menu opened.';}
+   else if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(shareData.text+' '+shareData.url);status.textContent='Share text copied. Paste it into a message.';}
+   else{status.textContent='Sharing is not supported in this browser. You can copy the website address: themaxchessss.github.io';}
+  }catch(e){if(e&&e.name!=='AbortError')status.textContent='Sharing could not open here. You can copy the website address: themaxchessss.github.io';}
+ });
  paint();
-})();
-</script>
+})();</script>
 
 </body>
 </html>
