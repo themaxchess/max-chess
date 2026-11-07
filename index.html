@@ -203,7 +203,7 @@ select.toolbtn{background:var(--panel2);border:0}
  .topsearch{display:none}
  .topright{margin-left:auto}
 }
-@media(max-width:760px){
+@media(max-width:820px){
  .topbar{flex-wrap:wrap;height:auto;padding:8px 12px;row-gap:4px}
  .topnav{order:3;width:100%;height:auto;flex-wrap:wrap}
  .navtop{padding:9px 10px}
@@ -497,6 +497,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  </div>
 
  <style>
+ .maxchess-promo-gif{width:100%;max-width:1080px;margin:18px auto;border:3px solid #1677ed;border-radius:12px;overflow:hidden;background:#050505;box-shadow:0 0 22px #1677ed44}.maxchess-promo-gif a{display:block;line-height:0}.maxchess-promo-gif img{display:block;width:100%;height:auto;max-height:335px;object-fit:contain;margin:0 auto}@media(prefers-reduced-motion:reduce){.maxchess-promo-gif img{animation:none}}
  .maxchess-promo{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(120px, .8fr) 2fr;align-items:center;gap:clamp(12px,3vw,30px);max-width:1080px;min-height:190px;margin:18px auto;padding:clamp(16px,3vw,28px);border:3px solid #1677ed;border-radius:12px;background:radial-gradient(ellipse at 20% 50%,#4b2c05 0,#15100a 38%,#050505 75%);box-shadow:0 0 22px #1677ed44,inset 0 0 28px #d9941533;color:#fff}
  .maxchess-promo:before{content:"";position:absolute;z-index:-1;inset:-30%;background:linear-gradient(110deg,transparent 38%,#ffdc6b18 48%,#fff5c044 50%,#ffdc6b18 52%,transparent 62%);transform:translateX(-55%);animation:maxPromoSweep 6s ease-in-out infinite}
  .maxchess-promo-logo{width:min(100%,170px);aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 0 14px #ffbf27aa);animation:maxPromoGlow 3s ease-in-out infinite}
@@ -509,10 +510,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  @media(max-width:560px){.maxchess-promo{grid-template-columns:90px 1fr;gap:10px;min-height:135px;padding:12px}.maxchess-promo-logo{width:90px}.maxchess-promo-line{margin:4px 0 8px}}
  @media(prefers-reduced-motion:reduce){.maxchess-promo:before,.maxchess-promo-logo{animation:none}}
  </style>
- <section class="maxchess-promo" aria-label="MaxChess promotional banner">
-  <img class="maxchess-promo-logo" src="./icon.svg?v=4" alt="Gold MaxChess queen logo">
-  <div class="maxchess-promo-copy"><h2 class="maxchess-promo-brand">MaxChess</h2><p class="maxchess-promo-line">Play Free Chess</p><a class="maxchess-promo-url" href="https://themaxchessss.github.io/">themaxchessss.github.io</a></div>
- </section>
+ <section class="maxchess-promo-gif" aria-label="Animated MaxChess promotion"><a href="https://themaxchessss.github.io/" aria-label="Play free chess on MaxChess"><img src="./gifs/maxchess-glow-ad.gif?v=1" alt="Animated MaxChess gold chess promotion. Play Free Chess at themaxchessss.github.io" width="600" height="314" fetchpriority="high"></a></section>
  <section class="max-daily" id="maxDailyChallenge" aria-labelledby="maxDailyTitle">
   <div><span class="max-daily-kicker">♟ DAILY TRAINING</span><h2 id="maxDailyTitle">Your 5-minute chess mission</h2><p id="maxDailyTask">Play one careful game and review one mistake.</p><p class="max-daily-note">A small daily habit builds stronger chess thinking.</p></div>
   <button type="button" id="maxDailyDone" class="max-daily-button">Mark today's mission complete</button>
