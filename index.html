@@ -408,6 +408,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    <button class="navitem" data-page="tournaments">Tournaments</button>
    <button class="navitem" data-page="donate">Support MaxChess</button>
    <button class="navitem" data-page="about">About MaxChess</button>
+   <button class="navitem" data-page="card-creators">Business Card Creators</button>
   </div></div>
   <div class="navgroup"><button type="button" class="navtop">Tools</button><div class="dropdown">
    <button class="navitem" data-page="analysis">Analysis board</button>
@@ -528,6 +529,39 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
 <section class="pageview" id="page-leagues"><div class="simplepage"><h2>🏆 MaxChess Leagues</h2><p class="muted">Earn League XP by completing your daily chess training. Your league is personal progress, not your official game rating.</p><div class="puzzlebox league-hero"><div class="league-rank" id="leagueRank">♟ Bronze League</div><div class="league-xp"><b id="leagueXP">0</b><span>total League XP</span></div><div class="league-progress"><span id="leagueProgressBar"></span></div><p class="desc" id="leagueProgressText">Complete training goals to reach the next league.</p></div><div class="puzzlebox" style="margin-top:14px"><h3>Daily missions</h3><p class="muted">Complete these goals in the Training Center to earn 10 XP each.</p><div class="league-missions"><div>♞ Solve a puzzle <span id="leagueMissionPuzzles">Not done</span></div><div>♟ Play a chess game <span id="leagueMissionGame">Not done</span></div><div>📘 Study a lesson or opening <span id="leagueMissionLearn">Not done</span></div><div>🔍 Review a mistake <span id="leagueMissionReview">Not done</span></div></div><button class="greenbtn" type="button" data-goto="training">Go to Training Center</button></div><div class="puzzlebox" style="margin-top:14px"><h3>League ladder</h3><div class="league-ladder"><div>♟ Bronze <small>0 XP</small></div><div>⚔️ Silver <small>100 XP</small></div><div>🏅 Gold <small>300 XP</small></div><div>💎 Diamond <small>700 XP</small></div><div>👑 Champion <small>1,500 XP</small></div></div></div></div></section>
 <section class="pageview" id="page-achievements"><div class="simplepage"><h2>🏅 Achievements &amp; player stats</h2><p class="muted">Your personal milestones and training records on this device. Online game results remain in your player profile.</p><div class="puzzlebox" style="margin-top:12px"><h3>My progress</h3><div class="hq-stats" style="margin-top:12px"><div class="hq-stat"><strong id="achTrainingDays">0</strong><span>Training days</span></div><div class="hq-stat"><strong id="achTrainingXP">0</strong><span>Training XP</span></div><div class="hq-stat"><strong id="achRushBest">0</strong><span>Puzzle Rush best</span></div><div class="hq-stat"><strong id="achStreak">0</strong><span>Current streak</span></div></div></div><div class="puzzlebox" style="margin-top:14px"><h3>Milestones</h3><div class="lesson-list" id="achievementList" aria-live="polite"></div></div><div class="puzzlebox" style="margin-top:14px"><h3>Keep improving</h3><p>Try a new puzzle, learn an opening, or challenge another player. Your milestones update as you train.</p><div class="hq-actions"><button type="button" data-goto="puzzles">Solve puzzles</button><button type="button" data-goto="openings">Study openings</button><button type="button" data-goto="play">Play a game</button><button type="button" data-goto="community">View leaderboard</button></div></div></div></section>
 <section class="pageview" id="page-donate"><div class="simplepage"><h2>Support MaxChess</h2><p class="muted">Help support the future of free chess on MaxChess.</p><div class="puzzlebox donation-card"><div class="donation-icon" aria-hidden="true">♡</div><h3>Donations are coming soon</h3><p>Every donation will go toward buying a custom domain for MaxChess, giving the website its own web address.</p><span class="donation-status">PAYMENT LINK NEEDED</span><p class="desc">MaxChess is free to play. Donations will only be used for the custom domain.</p><button class="widebtn" type="button" disabled aria-disabled="true">Donations unavailable</button></div></div></section>
+<section class="pageview" id="page-card-creators">
+ <div class="simplepage">
+  <h2>🎨 Become a MaxChess Business Card Creator</h2>
+  <p class="muted">Love chess and design? Help MaxChess players make brilliant business cards that show off their chess profiles.</p>
+  <div class="puzzlebox">
+   <h3>What creators do</h3>
+   <ul>
+    <li>Design attractive chess business cards for players.</li>
+    <li>Include a player's Lichess profile link or QR code when requested.</li>
+    <li>Make each card clear, original and easy to share.</li>
+    <li>Follow the MaxChess brand and respect players' privacy.</li>
+   </ul>
+   <p class="desc">Creators are independent volunteers. This is an application of interest, not a job offer or promise of payment. MaxChess is independent and is not affiliated with Lichess.</p>
+  </div>
+  <div class="puzzlebox" style="margin-top:14px">
+   <h3>Apply to be a card creator</h3>
+   <p class="muted">Tell the MaxChess team a little about your design ideas. The button opens an email draft for you to review and send; it does not send anything automatically.</p>
+   <form id="cardCreatorForm">
+    <label for="cardCreatorName">Your name or creator nickname</label>
+    <input id="cardCreatorName" maxlength="60" required placeholder="Creator name" style="width:100%;padding:10px;background:var(--panel3);color:var(--strong);border:1px solid var(--line);border-radius:6px">
+    <label for="cardCreatorLichess" style="display:block;margin-top:12px">Lichess username (optional)</label>
+    <input id="cardCreatorLichess" maxlength="30" placeholder="Your Lichess username" style="width:100%;padding:10px;background:var(--panel3);color:var(--strong);border:1px solid var(--line);border-radius:6px">
+    <label for="cardCreatorPortfolio" style="display:block;margin-top:12px">Link to a card design or portfolio (optional)</label>
+    <input id="cardCreatorPortfolio" maxlength="300" type="url" placeholder="https://…" style="width:100%;padding:10px;background:var(--panel3);color:var(--strong);border:1px solid var(--line);border-radius:6px">
+    <label for="cardCreatorIdea" style="display:block;margin-top:12px">What kind of cards would you like to create?</label>
+    <textarea id="cardCreatorIdea" maxlength="600" rows="3" placeholder="Tell us about your design ideas…" style="width:100%;padding:10px;background:var(--panel3);color:var(--strong);border:1px solid var(--line);border-radius:6px"></textarea>
+    <label style="display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:13px"><input id="cardCreatorGuardian" type="checkbox" style="width:auto;margin-top:3px"> If I am under 18, a parent or guardian has agreed to help me contact MaxChess about this.</label>
+    <button class="greenbtn" type="submit">✉️ Prepare my application</button>
+    <p class="desc" id="cardCreatorStatus" role="status" aria-live="polite"></p>
+   </form>
+  </div>
+ </div>
+</section>
 <section class="pageview" id="page-about"><div class="simplepage"><h2>About MaxChess</h2><div class="puzzlebox"><p><b>Chess should be fun and accessible.</b></p><p>MaxChess is a free chess-learning project with a playable board, beginner lessons, board themes, and move history. No subscription is needed.</p><p class="muted">This is an independent project inspired by the clean, community-focused style of modern chess sites; it is not affiliated with Lichess.</p></div></div></section>
 <section class="pageview" id="page-gifs"><div class="simplepage"><h2>MaxChess GIFs</h2><p class="muted">Animated MaxChess ads you can save and share. Right-click (or press and hold) a GIF to save it, or use the button.</p>
 <div class="gifgrid">
@@ -1315,6 +1349,28 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
     try{localStorage.setItem(key,'1');}catch(e){}
     paint(true);
   });
+})();
+</script>
+<script>
+(function(){
+ const form=document.getElementById('cardCreatorForm');
+ if(!form)return;
+ form.addEventListener('submit',function(event){
+  event.preventDefault();
+  const name=document.getElementById('cardCreatorName').value.trim();
+  const lichess=document.getElementById('cardCreatorLichess').value.trim();
+  const portfolio=document.getElementById('cardCreatorPortfolio').value.trim();
+  const idea=document.getElementById('cardCreatorIdea').value.trim();
+  const guardian=document.getElementById('cardCreatorGuardian').checked;
+  const status=document.getElementById('cardCreatorStatus');
+  if(!name){status.textContent='Please enter a creator name.';return}
+  if(lichess&&!/^[A-Za-z0-9_-]{2,30}$/.test(lichess)){status.textContent='Please check your Lichess username.';return}
+  if(portfolio){try{const u=new URL(portfolio);if(!['http:','https:'].includes(u.protocol))throw new Error()}catch(e){status.textContent='Please enter a valid http or https portfolio link.';return}}
+  const body=['MaxChess Business Card Creator application','', 'Creator name: '+name,'Lichess username: '+(lichess||'Not provided'),'Portfolio: '+(portfolio||'Not provided'),'Design ideas: '+(idea||'Not provided'),'Parent/guardian approval if under 18: '+(guardian?'Yes':'Not confirmed'),'','I understand this is an application of interest and not a promise of paid work.'].join('\n');
+  const href='mailto:mbeaton36@outlook.com?subject='+encodeURIComponent('MaxChess Business Card Creator application')+'&body='+encodeURIComponent(body);
+  status.textContent='Your email app should open with the application ready. Review it with a parent or guardian if needed, then send it yourself.';
+  window.location.href=href;
+ });
 })();
 </script>
 </body>
