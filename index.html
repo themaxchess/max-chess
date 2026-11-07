@@ -706,6 +706,24 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  </div>
 </div>
 
+<script>
+(function(){
+var appReady=false;
+window.addEventListener("maxchess:ready",function(){appReady=true});
+window.addEventListener("error",function(){appReady=false});
+document.addEventListener("click",function(event){
+if(appReady)return;
+var target=event.target;
+var el=target&&target.closest?target.closest("button,a,[role=button],[data-goto],[data-rightgo],[data-homegoto],[data-hqgo]"):null;
+if(!el)return;
+var page=el.getAttribute("data-page")||el.getAttribute("data-goto")||el.getAttribute("data-rightgo")||el.getAttribute("data-homegoto")||el.getAttribute("data-hqgo");
+if(["homePlay","homeComputer","homeLocal","homePlayComputer","playComputer","computerStart"].indexOf(el.id)>=0)page="play";
+if(page){event.preventDefault();document.querySelectorAll(".pageview").forEach(function(v){v.classList.remove("active")});var view=document.getElementById("page-"+page);if(view)view.classList.add("active");document.querySelectorAll(".navitem").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-page")===page)});window.scrollTo(0,0);return;}
+if(el.id==="loginBtn"||el.id==="signupBtn"){event.preventDefault();var modal=document.getElementById("accountModal");if(modal)modal.classList.add("open");var title=document.getElementById("accountTitle");if(title)title.textContent=el.id==="loginBtn"?"Sign in":"Register";var status=document.getElementById("authStatus");if(status)status.textContent="MaxChess is in iPad recovery mode. Reload the page to retry the full app.";return;}
+if(el.classList&&el.classList.contains("navtop")){var group=el.closest(".navgroup");if(group&&group.querySelector(".dropdown")){event.preventDefault();group.classList.toggle("open");}}
+},true);
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1397,6 +1415,7 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
   $('schoolSaveAccounts').onclick=async()=>{if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}const out=$('schoolAccountStatus');if(!$('schoolShareAccounts').checked){out.textContent='Please check the sharing permission box before saving.';return}out.textContent='Checking public Lichess profile…';const rows=[];const lichessName=$('schoolLichess').value.trim();if(lichessName){try{const profile=await schoolFetchLichessProfile(lichessName);rows.push({student_id:authUser.id,provider:'lichess',username:profile.username,share_with_teacher:true,updated_at:new Date().toISOString()});out.textContent='Lichess profile found: '+profile.username+'. Saving…'}catch(e){out.textContent=e.message;return}}const chesscomName=$('schoolChesscom').value.trim();if(chesscomName)rows.push({student_id:authUser.id,provider:'chesscom',username:chesscomName,share_with_teacher:true,updated_at:new Date().toISOString()});if(!rows.length){out.textContent='Enter a Lichess or Chess.com username.';return}const q=await authClient.from('school_external_accounts').upsert(rows,{onConflict:'student_id,provider'});out.textContent=q.error?'Could not save: '+q.error.message:'Account links saved. Your teachers can view the shared public stats. Lichess profile existence is verified; account ownership is not.'};
   $('schoolStopSharing').onclick=async()=>{if(!authClient||!authUser){note('Sign in first.');openAccount('login');return}const out=$('schoolAccountStatus');out.textContent='Removing shared usernames…';const q=await authClient.from('school_external_accounts').delete().eq('student_id',authUser.id);out.textContent=q.error?'Could not remove links: '+q.error.message:'Your external account usernames have been removed from MaxChess School.';$('schoolShareAccounts').checked=false;$('schoolLichess').value='';$('schoolChesscom').value=''};
   const schoolNav=document.querySelector('[data-page="schools"]');if(schoolNav)schoolNav.addEventListener('click',schoolLoad);
+window.dispatchEvent(new Event("maxchess:ready"));
 })();
 </script>
 
