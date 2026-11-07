@@ -395,6 +395,12 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
 .max-business-card .mbc-bottom{display:flex;align-items:end;justify-content:space-between;gap:6px}
 .max-business-card .mbc-foot{font-size:9px;line-height:1.35;color:#e7e6ef;overflow-wrap:anywhere;min-width:0}
 .max-business-card .mbc-qr{width:48px;height:48px;flex:0 0 48px;background:#fff;padding:2px;border-radius:3px;object-fit:contain}
+.max-business-card.back-card{align-items:center;text-align:center;justify-content:center;gap:5px}
+.max-business-card.back-card .mbc-back-title{font-size:14px;font-weight:900;letter-spacing:2px;color:#e8c765}
+.max-business-card.back-card .mbc-back-qr{width:82px;height:82px;object-fit:contain;background:#fff;padding:3px;border-radius:4px}
+.max-business-card.back-card .mbc-back-url{font-size:9px;font-weight:700;overflow-wrap:anywhere}
+.max-business-card.card-blue .mbc-back-title{color:#9fe5ff}
+.max-business-card.card-mono .mbc-back-title{color:#222}
 .max-business-card.card-blue{background:linear-gradient(135deg,#082c55,#1474ad)}
 .max-business-card.card-blue .mbc-brand,.max-business-card.card-blue .mbc-title{color:#9fe5ff}
 .max-business-card.card-mono{background:#fff;color:#111;border:1px dashed #555}
@@ -414,8 +420,11 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
  #page-business-cards .card-editor,#page-business-cards .card-preview-wrap h3,#page-business-cards .simplepage>h2,#page-business-cards .simplepage>p{display:none!important}
  #page-business-cards .simplepage{max-width:none!important;margin:0!important;padding:0!important}
  #page-business-cards .card-preview-wrap{margin:0!important}
- #page-business-cards .print-card-sheet{grid-template-columns:repeat(2,3.5in);grid-template-rows:repeat(4,2in);gap:.12in;justify-content:center}
+ #page-business-cards .print-card-sheet{grid-template-columns:repeat(2,3.5in);grid-template-rows:repeat(4,2in);gap:.12in;justify-content:center;break-inside:avoid;page-break-inside:avoid}
+ #page-business-cards #printCardSheet{break-after:page;page-break-after:always}
  #page-business-cards .max-business-card{width:3.5in;height:2in;aspect-ratio:auto;border:1px dashed #777;border-radius:0;box-shadow:none;padding:.16in;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ #page-business-cards .max-business-card.back-card .mbc-back-qr{width:1.05in;height:1.05in;flex-basis:auto}
+ #page-business-cards .card-back-heading{display:none!important}
  #page-business-cards .max-business-card .mbc-name{font-size:19pt}
  #page-business-cards .max-business-card .mbc-title{font-size:10pt}
  #page-business-cards .max-business-card .mbc-foot{font-size:7.5pt}
@@ -599,8 +608,10 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
    <p class="desc" id="printCardsStatus" role="status" aria-live="polite">Print opens your print window. Choose “Actual size” or 100%; choose “Save as PDF” there to create a PDF file.</p>
   </div>
   <div class="card-preview-wrap">
-   <h3>Preview — 8 cards</h3>
-   <div class="print-card-sheet" id="printCardSheet" aria-label="Preview of eight printable MaxChess business cards"></div>
+   <h3>Front — 8 cards</h3>
+   <div class="print-card-sheet" id="printCardSheet" aria-label="Preview of eight printable MaxChess business card fronts"></div>
+   <h3 class="card-back-heading">Back — 8 cards (website QR code)</h3>
+   <div class="print-card-sheet card-back-sheet" id="printCardBackSheet" aria-label="Preview of eight printable MaxChess business card backs"></div>
   </div>
  </div>
 </section>
@@ -1421,7 +1432,8 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
 /* MaxChess printable business cards: three designs, Lichess QR, print/PDF and share. */
 (function(){
  const sheet=document.getElementById('printCardSheet');
- if(!sheet)return;
+ const backSheet=document.getElementById('printCardBackSheet');
+ if(!sheet||!backSheet)return;
  const fields=['printCardName','printCardTitle','printCardLichess','printCardExtra'];
  const clean=id=>document.getElementById(id).value.trim();
  const status=document.getElementById('printCardsStatus');
@@ -1450,6 +1462,15 @@ button,.toolbtn,.greenbtn,.widebtn,select{touch-action:manipulation}
     bottom.append(qr);
    }
    card.append(brand,middle,bottom);sheet.append(card);
+  }
+  backSheet.replaceChildren();
+  for(let i=0;i<8;i++){
+   const back=document.createElement('article');back.className='max-business-card back-card '+design;
+   const heading=document.createElement('div');heading.className='mbc-back-title';heading.textContent='SCAN TO PLAY';
+   const qr=document.createElement('img');qr.className='mbc-back-qr';qr.alt='QR code linking to the MaxChess website';
+   qr.loading='eager';qr.decoding='sync';qr.src='https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=4&data='+encodeURIComponent('https://themaxchessss.github.io/');
+   const url=document.createElement('div');url.className='mbc-back-url';url.textContent='themaxchessss.github.io';
+   back.append(heading,qr,url);backSheet.append(back);
   }
  }
  fields.forEach(id=>document.getElementById(id).addEventListener('input',paint));
